@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { UserContext } from './UserContext';
 
 const Menu = ({ navigation }) => {
+  const { username } = useContext(UserContext);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -9,7 +11,9 @@ const Menu = ({ navigation }) => {
           source={require('../assets/th.jpg')} // Imagen de perfil de ejemplo
           style={styles.profileImage} 
         />
-        <Text style={styles.username}>Nombre de Usuario</Text>
+        <Text style={styles.username}>
+          {username} {/* Mostrar el nombre de usuario */}
+        </Text> 
       </View>
       <View style={styles.menuList}>
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Home')}>
