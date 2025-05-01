@@ -7,7 +7,18 @@ const images = [
   require('../assets/th.jpg'),
 ];
 
-const HomeScreen = () => {
+const styles = StyleSheet.create({
+  carousel: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  image: {
+    height: 250,
+    resizeMode: 'cover',
+  },
+});
+
+export const HomeScreen = () => {
   const scrollViewRef = useRef();
   const { width } = Dimensions.get('window');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,16 +52,3 @@ const HomeScreen = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  carousel: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  image: {
-    height: 250,
-    resizeMode: 'cover',
-  },
-});
-
-export default HomeScreen;

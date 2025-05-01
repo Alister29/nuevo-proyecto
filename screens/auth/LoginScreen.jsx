@@ -1,10 +1,28 @@
 import React, { useState, useContext} from 'react';
 import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import { collection, query, where, getDocs } from 'firebase/firestore'; // Importar funciones de Firestore
-import { db } from '../database/firebase'; // Asegúrate de importar la instancia de Firestore
-import { UserContext } from './UserContext';
+import { db } from '../../database/firebase'; // Asegúrate de importar la instancia de Firestore
+import { UserContext } from '../../context';
 
-const LoginScreen = ({ navigation }) => {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  input: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+  },
+  separator: {
+    height: 10, // Espacio entre los botones
+  },
+});
+
+export const LoginScreen = ({ navigation }) => {
   const [state, setState] = useState({
     name: '',
     contraseña: '',
@@ -61,23 +79,3 @@ const LoginScreen = ({ navigation }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-  },
-  separator: {
-    height: 10, // Espacio entre los botones
-  },
-});
-
-export default LoginScreen;

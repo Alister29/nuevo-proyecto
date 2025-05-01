@@ -1,10 +1,24 @@
 import React, { useState, useContext } from "react";
 import { View, Button, TextInput, ScrollView, StyleSheet, Alert } from "react-native";
-import { db } from '../database/firebase';
+import { db } from '../../database/firebase';
 import { collection, addDoc } from "firebase/firestore";
-import { UserContext } from './UserContext';
+import { UserContext } from '../../context';
 
-const Usuarios = ({ navigation }) => {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 35,
+  },
+  inputGroup: {
+    flex: 1,
+    padding: 0,
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#cccccc",
+  },
+});
+
+export const RegisterScreen = ({ navigation }) => {
   const { setUsername } = useContext(UserContext); // Acceder al actualizador del contexto
   const [state, setState] = useState({
     name: "",
@@ -82,19 +96,3 @@ const Usuarios = ({ navigation }) => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 35,
-  },
-  inputGroup: {
-    flex: 1,
-    padding: 0,
-    marginBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#cccccc",
-  },
-});
-
-export default Usuarios;

@@ -1,8 +1,43 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { UserContext } from './UserContext';
+import { UserContext } from '../context';
 
-const Menu = ({ navigation }) => {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  header: {
+    alignItems: 'center',
+    paddingVertical: 40,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  profileImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginBottom: 10,
+  },
+  username: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  menuList: {
+    marginTop: 20,
+  },
+  menuItem: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  menuText: {
+    fontSize: 18,
+  },
+});
+
+export const Menu = ({ navigation }) => {
   const { username } = useContext(UserContext);
   return (
     <View style={styles.container}>
@@ -42,40 +77,3 @@ const Menu = ({ navigation }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  profileImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    marginBottom: 10,
-  },
-  username: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  menuList: {
-    marginTop: 20,
-  },
-  menuItem: {
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  menuText: {
-    fontSize: 18,
-  },
-});
-
-export default Menu;
