@@ -41,17 +41,28 @@ export const DrawerContent = ({ navigation, ...props }) => {
         <Ionicons name="person-circle-outline" size={40} color="black" />
         <View style={styles.headerDetails}>
           <Text style={styles.sesion}>{username}</Text>
-          <TouchableOpacity onPress={() => navigation.navigate(ROUTES.LOGIN)}>
-            <Text style={{ ...styles.sesion, color: theme.primary }}>
-              Iniciar Sesion
-            </Text>
-          </TouchableOpacity>
+          {username === "Usuario" && (
+            <TouchableOpacity onPress={() => navigation.navigate(ROUTES.LOGIN)}>
+              <Text style={{ ...styles.sesion, color: theme.primary }}>
+                Iniciar Sesion
+              </Text>
+            </TouchableOpacity>
+          )}
+          {username !== "Usuario" && (
+            <TouchableOpacity onPress={() => {}}>
+              <Text style={{ ...styles.sesion, color: theme.primary }}>
+                Cerrar Sesion
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
       <DrawerItem
         label={ROUTES.INICIO}
-        onPress={() => {navigation.navigate(ROUTES.INICIO)}}
+        onPress={() => {
+          navigation.navigate(ROUTES.INICIO);
+        }}
         focused={focused === ROUTES.INICIO}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
