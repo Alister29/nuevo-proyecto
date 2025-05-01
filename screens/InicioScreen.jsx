@@ -1,21 +1,57 @@
-import React, { useContext } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { View, StyleSheet } from "react-native";
+
+import { TarjetaInicio } from "../components";
+import { ROUTES } from "../navigation/routes";
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "black",
+  container: {
+    padding: 20,
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  item: {
+    width: "50%",
+    paddingVertical:5,
   },
 });
 
-export const InicioScreen = () => {
+export const InicioScreen = ({ navigation }) => {
   return (
-    <View>
-      <Pressable style={styles.card}>
-        <Text>Hola</Text>
-      </Pressable>
+    <View style={styles.container}>
+      <View style={styles.item}>
+        <TarjetaInicio
+          titulo={"Horario"}
+          icono={"time-outline"}
+          detalle={"0 Materias este semestre"}
+          onPress={() => {navigation.navigate(ROUTES.HORARIO)}}
+        />
+      </View>
+      <View style={styles.item}>
+        <TarjetaInicio
+          titulo={"Progreso Académico"}
+          icono={"bookmark-outline"}
+          detalle={"0/0 Materias vencidas"}
+          onPress={() => {}}
+        />
+      </View>
+      <View style={styles.item}>
+        <TarjetaInicio
+          titulo={"Eventos"}
+          icono={"calendar-clear-outline"}
+          detalle={"0 Eventos nuevos"}
+          onPress={() => {}}
+        />
+      </View>
+      <View style={styles.item}>
+        <TarjetaInicio
+          titulo={"Mapa"}
+          icono={"location-outline"}
+          detalle={"Consultar"}
+          onPress={() => {}}
+        />
+      </View>
     </View>
   );
 };
