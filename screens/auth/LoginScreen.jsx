@@ -1,8 +1,10 @@
 import React, { useState, useContext} from 'react';
 import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import { collection, query, where, getDocs } from 'firebase/firestore'; // Importar funciones de Firestore
+
 import { db } from '../../database/firebase'; // Asegúrate de importar la instancia de Firestore
 import { UserContext } from '../../context';
+import { ROUTES } from "../../navigation/routes";
 
 const styles = StyleSheet.create({
   container: {
@@ -47,7 +49,7 @@ export const LoginScreen = ({ navigation }) => {
         // Usuario válido, redirigir a la pantalla principal
         Alert.alert('¡Éxito!', 'Inicio de sesión exitoso.');
         setUsername(state.name);
-        navigation.replace('Main'); // Navegar a la pantalla principal
+        navigation.replace(ROUTES.INICIO); // Navegar a la pantalla principal
         
       }
     } catch (error) {
@@ -57,7 +59,7 @@ export const LoginScreen = ({ navigation }) => {
   };
 
   const navigateToRegister = () => {
-    navigation.navigate('Usuarios'); // Navegar a la pantalla de registro
+    navigation.navigate(ROUTES.REGISTRO_USUARIO); // Navegar a la pantalla de registro
   };
 
   return (

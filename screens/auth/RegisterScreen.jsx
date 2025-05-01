@@ -1,8 +1,10 @@
 import React, { useState, useContext } from "react";
 import { View, Button, TextInput, ScrollView, StyleSheet, Alert } from "react-native";
-import { db } from '../../database/firebase';
 import { collection, addDoc } from "firebase/firestore";
+
+import { db } from '../../database/firebase';
 import { UserContext } from '../../context';
+import { ROUTES } from "../../navigation/routes";
 
 const styles = StyleSheet.create({
   container: {
@@ -55,7 +57,7 @@ export const RegisterScreen = ({ navigation }) => {
       });
       Alert.alert("¡Éxito!", "Guardado correctamente.");
       setUsername(state.name);
-      navigation.replace('Main');
+      navigation.replace(ROUTES.INICIO);
     } catch (error) {
       Alert.alert("Error", "Error al guardar: " + error.message);
     }
