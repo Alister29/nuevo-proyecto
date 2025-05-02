@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { ROUTES } from "./routes";
 import { UserContext, ThemeContext } from "../context";
+import { getAuth, signOut } from "firebase/auth";
 
 const styles = StyleSheet.create({
   separator: {
@@ -33,7 +34,7 @@ export const DrawerContent = ({ navigation, ...props }) => {
   const { routeNames, index } = props.state;
   const focused = routeNames[index];
   const { theme } = useContext(ThemeContext);
-  const { username } = useContext(UserContext);
+  const { username, setUsername } = useContext(UserContext);
 
   return (
     <DrawerContentScrollView {...props}>
@@ -49,7 +50,18 @@ export const DrawerContent = ({ navigation, ...props }) => {
             </TouchableOpacity>
           )}
           {username !== "Usuario" && (
-            <TouchableOpacity onPress={() => {}}>
+            <TouchableOpacity
+              onPress={async () => {
+                const auth = getAuth();
+                try {
+                  await signOut(auth);
+                  setUsername("Usuario");
+                  navigation.navigate(ROUTES.LOGIN);
+                } catch (error) {
+                  console.error("Error al cerrar sesión:", error);
+                }
+              }}
+            >
               <Text style={{ ...styles.sesion, color: theme.primary }}>
                 Cerrar Sesion
               </Text>

@@ -1,21 +1,19 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDLtT0ZVtrLuNK0EQoyA69k13WfsYIEw4k",
-  authDomain: "react-native-firebase-1f512.firebaseapp.com",
-  projectId: "react-native-firebase-1f512",
-  storageBucket: "react-native-firebase-1f512.firebasestorage.app",
-  messagingSenderId: "408773415691",
-  appId: "1:408773415691:web:f546990303c88b63b5480e",
-  measurementId: "G-RP7KLMQY4L"
+  apiKey: "AIzaSyABI_vo0bpk1KoT3TZMVpTkMadA3hpPj_A",
+  authDomain: "unilink-fc7e9.firebaseapp.com",
+  projectId: "unilink-fc7e9",
+  storageBucket: "unilink-fc7e9.firebasestorage.app",
+  messagingSenderId: "532926208946",
+  appId: "1:532926208946:web:ba6f1bfdba89c4ac5ce2ab"
 };
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);  // Aquí creamos la instancia de Firestore
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-export { db };
-
-
-
+export { db, auth };
