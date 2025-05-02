@@ -1,14 +1,26 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../../database/firebase';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, getAuth, signInWithCredential, GoogleAuthProvider } from "firebase/auth";
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import { UserContext } from '../../context';
 import { ROUTES } from "../../navigation/routes";
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from "react-native";
 
+WebBrowser.maybeCompleteAuthSession();
+
 export const LoginScreen = ({ navigation }) => {
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: '1022212900711-v8arhddmno8b7va9kuod2v5me4aptr2r.apps.googleusercontent.com',
+    expoClientId: '532926208946-5cf1fe53mtpded3ekjelpa04qm1gpfjr.apps.googleusercontent.com',
+    webClientId: '532926208946-5cf1fe53mtpded3ekjelpa04qm1gpfjr.apps.googleusercontent.com',
+  },{
+    projectNameForProxy: "@name/slug"
+  });
+
   const [state, setState] = useState({ user: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -78,6 +90,37 @@ export const LoginScreen = ({ navigation }) => {
     navigation.navigate(ROUTES.REGISTRO_USUARIO);
   };
 
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+  
+      const credential = GoogleAuthProvider.credential(null, authentication.accessToken);
+      signInWithCredential(auth, credential)
+        .then(async (userCred) => {
+          const user = userCred.user;
+          setUsername(user.displayName);
+          setEmail(user.email);
+  
+          // Verificar si el usuario ya existe en Firestore
+          const userRef = doc(db, "usuarios", user.uid);
+          const docSnap = await getDoc(userRef);
+  
+          if (!docSnap.exists()) {
+            await setDoc(userRef, {
+              //authid: user.uid,
+              name: user.displayName,
+              email: user.email
+            });
+          }
+  
+          navigation.navigate(ROUTES.INICIO);
+        })
+        .catch((error) => {
+          console.error("Error al autenticar con Firebase:", error);
+        });
+    }
+  }, [response]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bienvenido/a</Text>
@@ -116,7 +159,9 @@ export const LoginScreen = ({ navigation }) => {
 
       <View style={styles.separator} />
 
-      <TouchableOpacity style={styles.googleButton} onPress={() => {}}>
+      <TouchableOpacity style={styles.googleButton} onPress={() => promptAsync()}
+        disabled={!request}
+      >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Image source={require("../../assets/google.png")} 
             style={{ width: 25, height: 25, marginRight: 10 }} />
