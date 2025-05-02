@@ -1,83 +1,183 @@
-import React, { useState, useContext} from 'react';
-import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import { collection, query, where, getDocs } from 'firebase/firestore'; // Importar funciones de Firestore
-
-import { db } from '../../database/firebase'; // Asegúrate de importar la instancia de Firestore
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../database/firebase';
 import { UserContext } from '../../context';
 import { ROUTES } from "../../navigation/routes";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-  },
-  separator: {
-    height: 10, // Espacio entre los botones
-  },
-});
+
+import { Ionicons } from '@expo/vector-icons';
+import { signInWithEmailAndPassword, signInWithCredential, GoogleAuthProvider, getAuth} from "firebase/auth";
+import { auth } from "../../database/firebase";
 
 export const LoginScreen = ({ navigation }) => {
   const [state, setState] = useState({
-    name: '',
-    contraseña: '',
+    user: '',
+    password: '',
   });
-  const { setUsername } = useContext(UserContext);
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const { setUsername, setEmail } = useContext(UserContext);
+
   const handleChangeText = (field, value) => {
     setState({ ...state, [field]: value });
   };
 
   const loginUser = async () => {
+    const { user, password } = state;
+  
     try {
-      // Crear consulta a Firestore
-      const usersRef = collection(db, 'usuarios'); // Referencia a la colección
-      const q = query(usersRef, where('name', '==', state.name), where('contraseña', '==', state.contraseña)); // Filtrar por usuario y contraseña
-
-      const querySnapshot = await getDocs(q); // Ejecutar la consulta
-
-      if (querySnapshot.empty) {
-        // Si no se encontró ningún documento que coincida
-        Alert.alert('Error', 'Usuario o contraseña incorrectos.');
-      } else {
-        // Usuario válido, redirigir a la pantalla principal
-        Alert.alert('¡Éxito!', 'Inicio de sesión exitoso.');
-        setUsername(state.name);
-        navigation.replace(ROUTES.INICIO); // Navegar a la pantalla principal
-        
+      let email = user;
+      let username = '';
+  
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(user)) {
+        const usersRef = collection(db, 'usuarios');
+        const q = query(usersRef, where('name', '==', user));
+        const querySnapshot = await getDocs(q);
+  
+        if (querySnapshot.empty) {
+          Alert.alert('Error', 'Usuario no encontrado.');
+          return;
+        }
+  
+        const userData = querySnapshot.docs[0].data();
+        email = userData.email;
+        username = userData.name;
       }
+  
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  
+      if (username === '') {
+        const usersRef = collection(db, 'usuarios');
+        const q = query(usersRef, where('email', '==', email));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const userData = querySnapshot.docs[0].data();
+          username = userData.name;
+        }
+      }
+  
+      Alert.alert('¡Éxito!', 'Inicio de sesión exitoso.');
+      setUsername(username);
+      setEmail(email);
+      navigation.navigate(ROUTES.INICIO);
+  
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Hubo un problema al procesar tu solicitud.');
+      Alert.alert('Error', error.message);
     }
-  };
+  };  
 
   const navigateToRegister = () => {
-    navigation.navigate(ROUTES.REGISTRO_USUARIO); // Navegar a la pantalla de registro
+    navigation.navigate(ROUTES.REGISTRO_USUARIO);
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Bienvenido/a</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Usuario"
-        onChangeText={(value) => handleChangeText('name', value)}
+        placeholderTextColor="#555"
+        onChangeText={(value) => handleChangeText('user', value)}
       />
-      <TextInput
-        style={styles.input}
-        secureTextEntry
-        placeholder="Contraseña"
-        onChangeText={(value) => handleChangeText('contraseña', value)}
-      />
-      <Button title="Iniciar sesión" onPress={loginUser} />
+
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.inputPassword}
+          placeholder="Contraseña"
+          placeholderTextColor="#555"
+          secureTextEntry={!showPassword}
+          onChangeText={(value) => handleChangeText('password', value)}
+        />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.loginButton} onPress={loginUser}>
+        <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={navigateToRegister}>
+        <Text style={styles.link}>Crear cuenta</Text>
+      </TouchableOpacity>
+
       <View style={styles.separator} />
-      <Button title="Crear cuenta" onPress={navigateToRegister} />
+
+      <TouchableOpacity style={styles.googleButton} onPress={() => {}}>
+        <Text style={styles.googleButtonText}>
+          <Text style={{ fontSize: 18 }}>🌐 </Text>Inicia Sesion con Google
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    alignSelf: 'center',
+  },
+  input: {
+    backgroundColor: '#e1ecf4',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e1ecf4',
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  inputPassword: {
+    flex: 1,
+    padding: 15,
+    fontSize: 16,
+  },
+  loginButton: {
+    backgroundColor: '#57b0f6',
+    borderRadius: 20,
+    padding: 15,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  link: {
+    color: '#007bff',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  separator: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginVertical: 20,
+  },
+  googleButton: {
+    backgroundColor: '#a9dcf6',
+    borderRadius: 20,
+    padding: 15,
+    alignItems: 'center',
+  },
+  googleButtonText: {
+    fontSize: 16,
+    color: '#000',
+  },
+});
