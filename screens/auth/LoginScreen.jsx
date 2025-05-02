@@ -6,6 +6,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { UserContext } from '../../context';
 import { ROUTES } from "../../navigation/routes";
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from "react-native";
 
 export const LoginScreen = ({ navigation }) => {
   const [state, setState] = useState({ user: '', password: '' });
@@ -116,9 +117,11 @@ export const LoginScreen = ({ navigation }) => {
       <View style={styles.separator} />
 
       <TouchableOpacity style={styles.googleButton} onPress={() => {}}>
-        <Text style={styles.googleButtonText}>
-          <Text style={{ fontSize: 18 }}>🌐 </Text>Inicia Sesión con Google
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Image source={require("../../assets/google.png")} 
+            style={{ width: 25, height: 25, marginRight: 10 }} />
+          <Text style={styles.googleButtonText}>Inicia Sesión con Google</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -127,7 +130,7 @@ export const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 30,
     justifyContent: 'center',
     backgroundColor: '#fff',
   },
@@ -138,7 +141,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   input: {
-    backgroundColor: '#e1ecf4',
+    backgroundColor: '#ECF4F9',
     padding: 15,
     borderRadius: 15,
     marginBottom: 15,
@@ -147,7 +150,7 @@ const styles = StyleSheet.create({
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e1ecf4',
+    backgroundColor: '#ECF4F9',
     borderRadius: 15,
     paddingHorizontal: 10,
     marginBottom: 10,
@@ -164,20 +167,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   loginButton: {
-    backgroundColor: '#57b0f6',
+    backgroundColor: '#69C7F9',
     borderRadius: 20,
     padding: 15,
     alignItems: 'center',
     marginBottom: 10,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 16,
   },
   link: {
     color: '#007bff',
-    textAlign: 'center',
-    marginBottom: 20,
+    textAlign: 'left',
+    marginTop: 20,
   },
   separator: {
     borderBottomWidth: 1,

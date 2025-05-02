@@ -30,32 +30,44 @@ export const RegisterScreen = ({ navigation }) => {
   const validateField = async (name, value) => {
     const newErrors = { ...errors };
 
-    if (name === "name" && !value.trim()) {
-      newErrors.name = "* El nombre de usuario es obligatorio.";
-    } else {
-      delete newErrors.name;
+    if (name === "name") {
+      if (!value.trim()) {
+        delete newErrors.name;
+      } else if (!value.trim()) {
+        newErrors.name = " El nombre de usuario es obligatorio.";
+      } else {
+        delete newErrors.name;
+      }
     }
 
     if (name === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
-        newErrors.email = "* El correo no es válido.";
-      } else {
+      if (!value.trim()) {
         delete newErrors.email;
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          newErrors.email = " El correo no es válido.";
+        } else {
+          delete newErrors.email;
+        }
       }
     }
 
     if (name === "contraseña") {
-      if (value.length < 6) {
-        newErrors.contraseña = "* La contraseña debe tener al menos 6 caracteres.";
+      if (!value.trim()) {
+        delete newErrors.contraseña;
+      } else if (value.length < 6) {
+        newErrors.contraseña = " La contraseña debe tener al menos 6 caracteres.";
       } else {
         delete newErrors.contraseña;
       }
     }
 
     if (name === "confirmarContraseña") {
-      if (value !== state.contraseña) {
-        newErrors.confirmarContraseña = "* Las contraseñas no coinciden.";
+      if (!value.trim()) {
+        delete newErrors.confirmarContraseña;
+      } else if (value !== state.contraseña) {
+        newErrors.confirmarContraseña = " Las contraseñas no coinciden.";
       } else {
         delete newErrors.confirmarContraseña;
       }
@@ -68,10 +80,10 @@ export const RegisterScreen = ({ navigation }) => {
     const { name, email, contraseña, confirmarContraseña } = state;
     const newErrors = {};
 
-    if (!name) newErrors.name = "* El nombre de usuario es obligatorio.";
-    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = "* El correo no es válido.";
-    if (contraseña.length < 6) newErrors.contraseña = "* La contraseña debe tener al menos 6 caracteres.";
-    if (contraseña !== confirmarContraseña) newErrors.confirmarContraseña = "* Las contraseñas no coinciden.";
+    if (!name) newErrors.name = " El nombre de usuario es obligatorio.";
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = " El correo no es válido.";
+    if (contraseña.length < 6) newErrors.contraseña = " La contraseña debe tener al menos 6 caracteres.";
+    if (contraseña !== confirmarContraseña) newErrors.confirmarContraseña = " Las contraseñas no coinciden.";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -80,10 +92,20 @@ export const RegisterScreen = ({ navigation }) => {
 
     try {
       // Validar si ya existe un usuario con ese nombre
-      const q = query(collection(db, "usuarios"), where("name", "==", name));
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        setErrors({ name: "* El nombre de usuario ya está registrado." });
+      const qName = query(collection(db, "usuarios"), where("name", "==", name));
+      const querySnapshotName = await getDocs(qName);
+    
+      if (!querySnapshotName.empty) {
+        setErrors({ ...errors, name: "El nombre de usuario ya está registrado." });
+        return;
+      }
+    
+      // Validar si ya existe un usuario con ese correo
+      const qEmail = query(collection(db, "usuarios"), where("email", "==", email));
+      const querySnapshotEmail = await getDocs(qEmail);
+    
+      if (!querySnapshotEmail.empty) {
+        setErrors({ ...errors, email: "El correo ya está registrado." });
         return;
       }
 
@@ -176,46 +198,45 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 30,
   },
   input: {
-    backgroundColor: "#D9E3F0",
-    borderRadius: 10,
+    backgroundColor: '#ECF4F9',
     padding: 15,
-    marginBottom: 5,
-    color: "#000",
+    borderRadius: 15,
+    marginBottom: 15,
+    fontSize: 16,
   },
   passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#D9E3F0",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginBottom: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ECF4F9',
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    marginBottom: 15,
   },
   passwordInput: {
     flex: 1,
-    color: "#000",
+    padding: 15,
+    fontSize: 16,
   },
   button: {
-    backgroundColor: "#00A8FF",
+    backgroundColor: '#69C7F9',
     padding: 15,
     borderRadius: 25,
     alignItems: "center",
     marginVertical: 20,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: "#000",
     fontSize: 16,
   },
   linkText: {
     color: "#007BFF",
-    textAlign: "center",
+    textAlign: "left"
   },
   errorText: {
     color: "red",
