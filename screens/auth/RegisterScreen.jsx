@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { UserContext } from "../../context";
 import { ROUTES } from "../../navigation/routes";
 
@@ -18,41 +18,86 @@ export const RegisterScreen = ({ navigation }) => {
     confirmarContraseña: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChangeText = (name, value) => {
     setState({ ...state, [name]: value });
+    validateField(name, value);
+  };
+
+  const validateField = async (name, value) => {
+    const newErrors = { ...errors };
+
+    if (name === "name" && !value.trim()) {
+      newErrors.name = "* El nombre de usuario es obligatorio.";
+    } else {
+      delete newErrors.name;
+    }
+
+    if (name === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        newErrors.email = "* El correo no es válido.";
+      } else {
+        delete newErrors.email;
+      }
+    }
+
+    if (name === "contraseña") {
+      if (value.length < 6) {
+        newErrors.contraseña = "* La contraseña debe tener al menos 6 caracteres.";
+      } else {
+        delete newErrors.contraseña;
+      }
+    }
+
+    if (name === "confirmarContraseña") {
+      if (value !== state.contraseña) {
+        newErrors.confirmarContraseña = "* Las contraseñas no coinciden.";
+      } else {
+        delete newErrors.confirmarContraseña;
+      }
+    }
+
+    setErrors(newErrors);
   };
 
   const saveNewUser = async () => {
     const { name, email, contraseña, confirmarContraseña } = state;
-  
-    if (!name || !email || !contraseña || !confirmarContraseña) {
-      Alert.alert("Error", "Rellena todos los campos.");
+    const newErrors = {};
+
+    if (!name) newErrors.name = "* El nombre de usuario es obligatorio.";
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = "* El correo no es válido.";
+    if (contraseña.length < 6) newErrors.contraseña = "* La contraseña debe tener al menos 6 caracteres.";
+    if (contraseña !== confirmarContraseña) newErrors.confirmarContraseña = "* Las contraseñas no coinciden.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
-  
-    if (contraseña !== confirmarContraseña) {
-      Alert.alert("Error", "Las contraseñas no coinciden.");
-      return;
-    }
-  
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        contraseña
-      );
+      // Validar si ya existe un usuario con ese nombre
+      const q = query(collection(db, "usuarios"), where("name", "==", name));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        setErrors({ name: "* El nombre de usuario ya está registrado." });
+        return;
+      }
+
+      // Crear cuenta en Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, contraseña);
       const user = userCredential.user;
-  
-      // Guardar datos adicionales en Firestore
+
+      // Guardar en Firestore
       await addDoc(collection(db, "usuarios"), {
         authid: user.uid,
         name,
         email,
       });
-  
+
       Alert.alert("Éxito", "Usuario registrado correctamente.");
       setUsername(name);
       navigation.navigate(ROUTES.INICIO);
@@ -71,6 +116,7 @@ export const RegisterScreen = ({ navigation }) => {
         placeholderTextColor="#444"
         onChangeText={(value) => handleChangeText("name", value)}
       />
+      {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
       <TextInput
         style={styles.input}
@@ -79,6 +125,7 @@ export const RegisterScreen = ({ navigation }) => {
         placeholderTextColor="#444"
         onChangeText={(value) => handleChangeText("email", value)}
       />
+      {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
       <View style={styles.passwordContainer}>
         <TextInput
@@ -89,13 +136,10 @@ export const RegisterScreen = ({ navigation }) => {
           onChangeText={(value) => handleChangeText("contraseña", value)}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Ionicons
-            name={showPassword ? "eye-off" : "eye"}
-            size={24}
-            color="#444"
-          />
+          <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color="#444" />
         </TouchableOpacity>
       </View>
+      {errors.contraseña && <Text style={styles.errorText}>{errors.contraseña}</Text>}
 
       <View style={styles.passwordContainer}>
         <TextInput
@@ -103,20 +147,15 @@ export const RegisterScreen = ({ navigation }) => {
           placeholder="Confirmar contraseña"
           secureTextEntry={!showConfirmPassword}
           placeholderTextColor="#444"
-          onChangeText={(value) =>
-            handleChangeText("confirmarContraseña", value)
-          }
+          onChangeText={(value) => handleChangeText("confirmarContraseña", value)}
         />
-        <TouchableOpacity
-          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-        >
-          <Ionicons
-            name={showConfirmPassword ? "eye-off" : "eye"}
-            size={24}
-            color="#444"
-          />
+        <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+          <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={24} color="#444" />
         </TouchableOpacity>
       </View>
+      {errors.confirmarContraseña && (
+        <Text style={styles.errorText}>{errors.confirmarContraseña}</Text>
+      )}
 
       <TouchableOpacity style={styles.button} onPress={saveNewUser}>
         <Text style={styles.buttonText}>Registrarse</Text>
@@ -146,7 +185,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9E3F0",
     borderRadius: 10,
     padding: 15,
-    marginBottom: 15,
+    marginBottom: 5,
     color: "#000",
   },
   passwordContainer: {
@@ -156,7 +195,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    marginBottom: 15,
+    marginBottom: 5,
   },
   passwordInput: {
     flex: 1,
@@ -177,5 +216,10 @@ const styles = StyleSheet.create({
   linkText: {
     color: "#007BFF",
     textAlign: "center",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+    fontSize: 14,
   },
 });

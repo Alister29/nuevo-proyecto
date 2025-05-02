@@ -1,53 +1,53 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../database/firebase';
+import { db, auth } from '../../database/firebase';
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { UserContext } from '../../context';
 import { ROUTES } from "../../navigation/routes";
-
-
 import { Ionicons } from '@expo/vector-icons';
-import { signInWithEmailAndPassword, signInWithCredential, GoogleAuthProvider, getAuth} from "firebase/auth";
-import { auth } from "../../database/firebase";
 
 export const LoginScreen = ({ navigation }) => {
-  const [state, setState] = useState({
-    user: '',
-    password: '',
-  });
-  
+  const [state, setState] = useState({ user: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { setUsername, setEmail } = useContext(UserContext);
 
   const handleChangeText = (field, value) => {
     setState({ ...state, [field]: value });
+    setErrorMessage('');
   };
 
   const loginUser = async () => {
     const { user, password } = state;
-  
+
+    if (!user || !password) {
+      setErrorMessage('Por favor completa todos los campos.');
+      return;
+    }
+
     try {
       let email = user;
       let username = '';
-  
+
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(user)) {
         const usersRef = collection(db, 'usuarios');
         const q = query(usersRef, where('name', '==', user));
         const querySnapshot = await getDocs(q);
-  
+
         if (querySnapshot.empty) {
-          Alert.alert('Error', 'Usuario no encontrado.');
+          setErrorMessage('Usuario no encontrado.');
           return;
         }
-  
+
         const userData = querySnapshot.docs[0].data();
         email = userData.email;
         username = userData.name;
       }
-  
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  
+
+      await signInWithEmailAndPassword(auth, email, password);
+
       if (username === '') {
         const usersRef = collection(db, 'usuarios');
         const q = query(usersRef, where('email', '==', email));
@@ -57,17 +57,21 @@ export const LoginScreen = ({ navigation }) => {
           username = userData.name;
         }
       }
-  
-      Alert.alert('¡Éxito!', 'Inicio de sesión exitoso.');
+
       setUsername(username);
       setEmail(email);
       navigation.navigate(ROUTES.INICIO);
-  
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', error.message);
+      if (error.code === 'auth/wrong-password') {
+        setErrorMessage('La contraseña no coincide.');
+      } else if (error.code === 'auth/user-not-found') {
+        setErrorMessage('Usuario no encontrado.');
+      } else {
+        setErrorMessage('Error al iniciar sesión. Verifica tus datos.');
+      }
     }
-  };  
+  };
 
   const navigateToRegister = () => {
     navigation.navigate(ROUTES.REGISTRO_USUARIO);
@@ -82,6 +86,7 @@ export const LoginScreen = ({ navigation }) => {
         placeholder="Usuario"
         placeholderTextColor="#555"
         onChangeText={(value) => handleChangeText('user', value)}
+        value={state.user}
       />
 
       <View style={styles.passwordContainer}>
@@ -91,11 +96,14 @@ export const LoginScreen = ({ navigation }) => {
           placeholderTextColor="#555"
           secureTextEntry={!showPassword}
           onChangeText={(value) => handleChangeText('password', value)}
+          value={state.password}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
           <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="black" />
         </TouchableOpacity>
       </View>
+
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
       <TouchableOpacity style={styles.loginButton} onPress={loginUser}>
         <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
@@ -109,7 +117,7 @@ export const LoginScreen = ({ navigation }) => {
 
       <TouchableOpacity style={styles.googleButton} onPress={() => {}}>
         <Text style={styles.googleButtonText}>
-          <Text style={{ fontSize: 18 }}>🌐 </Text>Inicia Sesion con Google
+          <Text style={{ fontSize: 18 }}>🌐 </Text>Inicia Sesión con Google
         </Text>
       </TouchableOpacity>
     </View>
@@ -142,12 +150,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#e1ecf4',
     borderRadius: 15,
     paddingHorizontal: 10,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   inputPassword: {
     flex: 1,
     padding: 15,
     fontSize: 16,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+    fontSize: 14,
+    textAlign: 'center',
   },
   loginButton: {
     backgroundColor: '#57b0f6',
