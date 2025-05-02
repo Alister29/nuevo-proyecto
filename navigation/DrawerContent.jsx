@@ -92,7 +92,7 @@ export const DrawerContent = ({ navigation, ...props }) => {
       </View>
       <DrawerItem
         label={ROUTES.HORARIO}
-        onPress={() => {}}
+        onPress={() => {navigation.navigate(ROUTES.HORARIO)}}
         focused={focused === ROUTES.HORARIO}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -105,7 +105,7 @@ export const DrawerContent = ({ navigation, ...props }) => {
       />
       <DrawerItem
         label={ROUTES.PROGRESO_ACADEMICO}
-        onPress={() => {}}
+        onPress={() => {navigation.navigate(ROUTES.PROGRESO_ACADEMICO)}}
         focused={focused === ROUTES.PROGRESO_ACADEMICO}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -123,7 +123,7 @@ export const DrawerContent = ({ navigation, ...props }) => {
       </View>
       <DrawerItem
         label={ROUTES.EVENTOS}
-        onPress={() => {}}
+        onPress={() => {navigation.navigate(ROUTES.EVENTOS)}}
         focused={focused === ROUTES.EVENTOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -136,7 +136,7 @@ export const DrawerContent = ({ navigation, ...props }) => {
       />
       <DrawerItem
         label={ROUTES.MAPA}
-        onPress={() => {}}
+        onPress={() => {navigation.navigate(ROUTES.MAPA)}}
         focused={focused === ROUTES.MAPA}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -154,7 +154,7 @@ export const DrawerContent = ({ navigation, ...props }) => {
       </View>
       <DrawerItem
         label={ROUTES.SUBIR_DOCUMENTOS}
-        onPress={() => {}}
+        onPress={() => {navigation.navigate(ROUTES.SUBIR_DOCUMENTOS)}}
         focused={focused === ROUTES.SUBIR_DOCUMENTOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -167,7 +167,7 @@ export const DrawerContent = ({ navigation, ...props }) => {
       />
       <DrawerItem
         label={ROUTES.VER_DOCUMENTOS}
-        onPress={() => {}}
+        onPress={() => {navigation.navigate(ROUTES.VER_DOCUMENTOS)}}
         focused={focused === ROUTES.VER_DOCUMENTOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (

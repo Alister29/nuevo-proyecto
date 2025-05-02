@@ -33,7 +33,7 @@ export const InicioScreen = ({ navigation }) => {
           titulo={"Progreso Académico"}
           icono={"bookmark-outline"}
           detalle={"0/0 Materias vencidas"}
-          onPress={() => {}}
+          onPress={() => {navigation.navigate(ROUTES.PROGRESO_ACADEMICO)}}
         />
       </View>
       <View style={styles.item}>
@@ -41,7 +41,7 @@ export const InicioScreen = ({ navigation }) => {
           titulo={"Eventos"}
           icono={"calendar-clear-outline"}
           detalle={"0 Eventos nuevos"}
-          onPress={() => {}}
+          onPress={() => {navigation.navigate(ROUTES.EVENTOS)}}
         />
       </View>
       <View style={styles.item}>
@@ -49,7 +49,7 @@ export const InicioScreen = ({ navigation }) => {
           titulo={"Mapa"}
           icono={"location-outline"}
           detalle={"Consultar"}
-          onPress={() => {}}
+          onPress={() => {navigation.navigate(ROUTES.MAPA)}}
         />
       </View>
     </View>
