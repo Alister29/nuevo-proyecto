@@ -54,7 +54,7 @@ export const Menu = ({ navigation }) => {
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Home')}>
           <Text style={styles.menuText}>Inicio</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={() => {/* Acción Ajustes */}}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => { /* Acción Ajustes */ }}>
           <Text style={styles.menuText}>Crear Horario</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={() => { /* Acción Ajustes */ }}>
