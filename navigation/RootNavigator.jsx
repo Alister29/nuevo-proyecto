@@ -11,13 +11,13 @@ const Stack = createNativeStackNavigator();
 
 export const RootNavigator = () => {
   const { setUsername } = useContext(UserContext);
-  const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUsername(user.email); // o cualquier otro dato de usuario
+        setUsername(user.email);
         setIsAuthenticated(true);
       } else {
         setUsername("Usuario");
@@ -28,7 +28,7 @@ export const RootNavigator = () => {
     return unsubscribe;
   }, []);
 
-  if (isAuthenticated === null) return null; // o puedes mostrar una pantalla de carga
+  if (isAuthenticated === null) return null;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
