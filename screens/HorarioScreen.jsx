@@ -1,73 +1,58 @@
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  Button,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator
+  View, Text, Button, Modal, ScrollView, StyleSheet, TouchableOpacity
 } from "react-native";
-//import { loadScheduleData } from "../context/PdfScheduleLoader"; // por el momento esto estara comentado ya que queria que cargue desde un pdf las materias
+import scheduleData from "../context/scheduleData";
+import { guardarHorarioEnFirebase, cargarHorarioDesdeFirebase } from "../database/firebaseFunctions";
 
-// Días y horas usados en la cuadrícula del horario
-const diasSemana = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa"];
-const horas = ["06:45-08:15", "08:15-09:45", "09:45-11:15", "11:15-12:45", "12:45-14:15", "14:15-15:45", "15:45-17:15", "17:15-18:45", "18:45-20:15", "20:15-21:45"];
+// Días y horas en la cuadrícula del horario
+const diasSemana = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+const horas = [
+  "06:45-08:15", "08:15-09:45", "09:45-11:15",
+  "11:15-12:45", "12:45-14:15", "14:15-15:45",
+  "15:45-17:15", "17:15-18:45", "18:45-20:15", "20:15-21:45"
+];
 
 export const HorarioScreen = () => {
-  const [scheduleData, setScheduleData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [materiasAsignadas, setMateriasAsignadas] = useState([]);
   const [modalMateriasVisible, setModalMateriasVisible] = useState(false);
-  const [selectedLevel, setSelectedLevel] = useState("A");
+  const [selectedLevel, setSelectedLevel] = useState(null);
   const [expandedSubject, setExpandedSubject] = useState(null);
+  const [docenteSeleccionado, setDocenteSeleccionado] = useState({});
 
   useEffect(() => {
-    // Eliminamos la carga desde el PDF para mostrar un horario vacío o estático
-    /*
-    loadScheduleData().then((data) => {
-      setScheduleData(data);
-      setLoading(false);
-    });
-    */
-    setScheduleData({}); // 🔵 Usamos un objeto vacío para evitar errores
-    setLoading(false);  // 🔵 Desactivamos la pantalla de carga
+    cargarHorarioDesdeFirebase(setMateriasAsignadas); // Cargar horario guardado en Firebase
   }, []);
 
-  const toggleAssignment = (subject, option, chosenTeacher) => {
-    const exists = materiasAsignadas.some(
-      (a) => a.materia === subject.materia && a.dia === option.dia && a.hora === option.hora
-    );
-    if (exists) {
-      setMateriasAsignadas(
-        materiasAsignadas.filter(
-          (a) => !(a.materia === subject.materia && a.dia === option.dia && a.hora === option.hora)
-        )
-      );
+  // Manejo de selección y deselección de docente
+  const seleccionarDocente = (materia, docente) => {
+    const key = `${materia.nombre}-${docente.grupo}`;
+    const isAlreadyAssigned = materiasAsignadas.some(m => m.nombre === materia.nombre && m.grupo === docente.grupo);
+
+    if (isAlreadyAssigned) {
+      setMateriasAsignadas(prev => prev.filter(m => m.nombre !== materia.nombre || m.grupo !== docente.grupo));
+      setDocenteSeleccionado(prev => {
+        const updated = { ...prev };
+        delete updated[key];
+        return updated;
+      });
     } else {
-      setMateriasAsignadas([
-        ...materiasAsignadas,
-        {
-          materia: subject.materia, dia: option.dia,
-          hora: option.hora, aula: option.aula, docente: chosenTeacher
-        }
-      ]);
+      const nuevosHorarios = docente.horarios.map(horario => ({
+        nombre: materia.nombre,
+        grupo: docente.grupo,
+        dia: horario.dia,
+        hora: horario.hora,
+        aula: horario.aula
+      }));
+
+      setMateriasAsignadas(prev => [...prev, ...nuevosHorarios]);
+      setDocenteSeleccionado(prev => ({ ...prev, [key]: docente }));
     }
   };
 
-  if (loading) {
-    return (
-      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text>Cargando datos del PDF...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={{ flex: 1, padding: 10 }}>
-      {/* Cuadrícula del Horario */}
+      {/* Cuadrícula del Horario con formato corregido */}
       <ScrollView horizontal>
         <ScrollView>
           <View style={styles.scheduleContainer}>
@@ -83,10 +68,17 @@ export const HorarioScreen = () => {
               <View key={hora} style={styles.row}>
                 <View style={styles.hourCell}><Text style={styles.hourText}>{hora}</Text></View>
                 {diasSemana.map((dia) => {
-                  const assignment = materiasAsignadas.find((a) => a.dia === dia && a.hora === hora);
+                  const assignments = materiasAsignadas.filter((a) => a.dia === dia && a.hora === hora);
+                  
                   return (
-                    <View key={dia} style={[styles.cell, assignment && styles.cellMateria]}>
-                      {assignment && <Text style={styles.cellText}>{assignment.materia}</Text>}
+                    <View key={dia} style={[styles.cell, assignments.length > 1 && styles.cellChoque]}>
+                      {assignments.length > 1 ? (
+                        <Text style={styles.cellErrorText}>Existe un choque de horarios</Text>
+                      ) : (
+                        assignments.map((materia, index) => (
+                          <Text key={index} style={styles.cellText}>{materia.nombre} {materia.grupo} {materia.aula}</Text>
+                        ))
+                      )}
                     </View>
                   );
                 })}
@@ -96,46 +88,36 @@ export const HorarioScreen = () => {
         </ScrollView>
       </ScrollView>
 
-      {/* Botón para abrir el modal */}
-      <View style={styles.buttonContainer}>
-        <Button title="Ver Materias" onPress={() => setModalMateriasVisible(true)} />
-      </View>
+      <Button title="Ver Materias" onPress={() => setModalMateriasVisible(true)} />
+      <Button title="Guardar horario" onPress={() => guardarHorarioEnFirebase(materiasAsignadas)} />
 
       <Modal visible={modalMateriasVisible} animationType="slide">
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Selecciona Materias</Text>
-          {/* Selector de niveles */}
           <ScrollView style={styles.modalScroll}>
-            {["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"].map((level) => (
-              <TouchableOpacity
-                key={level}
-                onPress={() => { setSelectedLevel(level); setExpandedSubject(null); }}
-                style={[styles.nivelTitulo, selectedLevel === level && styles.materiaSeleccionada]}
-              >
+            {Object.keys(scheduleData).map((level) => (
+              <TouchableOpacity key={level} onPress={() => setSelectedLevel(level)} style={styles.nivelTitulo}>
                 <Text style={styles.materiaTitulo}>{level}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
-          {/* Lista de materias por nivel */}
-          <ScrollView>
-            {/* Ya no cargamos datos desde el PDF */}
-            {scheduleData[selectedLevel]?.map((subject, index) => (
-              <View key={index} style={styles.materiaContainer}>
-                <TouchableOpacity onPress={() => setExpandedSubject(expandedSubject === subject ? null : subject)}>
-                  <Text style={styles.materiaTitulo}>{subject.materia}</Text>
+
+          {scheduleData[selectedLevel]?.map((subject, index) => (
+            <View key={index} style={styles.materiaContainer}>
+              <TouchableOpacity onPress={() => setExpandedSubject(expandedSubject === subject ? null : subject)}>
+                <Text style={styles.materiaTitulo}>{subject.nombre}</Text>
+              </TouchableOpacity>
+
+              {expandedSubject === subject && subject.docentes.map((docente, i) => (
+                <TouchableOpacity key={i} onPress={() => seleccionarDocente(subject, docente)} style={[
+                  styles.docenteItem,
+                  docenteSeleccionado[`${subject.nombre}-${docente.grupo}`] && styles.docenteSeleccionado
+                ]}>
+                  <Text>{docente.grupo} {docente.nombre}</Text>
                 </TouchableOpacity>
-                {expandedSubject === subject && (
-                  <View style={styles.docenteLista}>
-                    {subject.opciones.map((option, i) => (
-                      <TouchableOpacity key={i} onPress={() => toggleAssignment(subject, option, option.docentes[0])}>
-                        <Text style={styles.docenteItem}>{option.dia} {option.hora} (Aula: {option.aula})</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </View>
-            ))}
-          </ScrollView>
+              ))}
+            </View>
+          ))}
+
           <Button title="Cerrar" onPress={() => setModalMateriasVisible(false)} />
         </View>
       </Modal>
@@ -241,4 +223,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     backgroundColor: "#005BB5",
   },
+  cellChoque: {
+    backgroundColor: "red",
+  },
+  cellErrorText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  
 });
