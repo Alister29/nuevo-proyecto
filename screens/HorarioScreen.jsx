@@ -42,7 +42,8 @@ export const HorarioScreen = () => {
         grupo: docente.grupo,
         dia: horario.dia,
         hora: horario.hora,
-        aula: horario.aula
+        aula: horario.aula,
+        aux: horario.aux 
       }));
 
       setMateriasAsignadas(prev => [...prev, ...nuevosHorarios]);
@@ -76,7 +77,9 @@ export const HorarioScreen = () => {
                         <Text style={styles.cellErrorText}>Existe un choque de horarios</Text>
                       ) : (
                         assignments.map((materia, index) => (
-                          <Text key={index} style={styles.cellText}>{materia.nombre} {materia.grupo} {materia.aula}</Text>
+                          <Text key={index} style={styles.cellText}>
+                            {materia.aux ? "✳" : ""}{materia.nombre} {materia.grupo} {materia.aula}
+                          </Text>
                         ))
                       )}
                     </View>
