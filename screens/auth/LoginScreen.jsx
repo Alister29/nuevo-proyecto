@@ -33,34 +33,48 @@ export const LoginScreen = ({ navigation }) => {
 
   const loginUser = async () => {
     const { user, password } = state;
-
+  
     if (!user || !password) {
       setErrorMessage('Por favor completa todos los campos.');
       return;
     }
-
+  
+    // Verificación de administrador (puedes cambiar estos valores)
+    const ADMIN_EMAIL = "admin@example.com";
+    const ADMIN_PASSWORD = "admin123";
+  
+    if (
+      (user === ADMIN_EMAIL || user === "admin") &&
+      password === ADMIN_PASSWORD
+    ) {
+      setUsername("Administrador");
+      setEmail(ADMIN_EMAIL);
+      navigation.navigate(ROUTES.ADMIN_HOME);
+      return;
+    }
+  
     try {
       let email = user;
       let username = '';
-
+  
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(user)) {
         const usersRef = collection(db, 'usuarios');
         const q = query(usersRef, where('name', '==', user));
         const querySnapshot = await getDocs(q);
-
+  
         if (querySnapshot.empty) {
           setErrorMessage('Usuario no encontrado.');
           return;
         }
-
+  
         const userData = querySnapshot.docs[0].data();
         email = userData.email;
         username = userData.name;
       }
-
+  
       await signInWithEmailAndPassword(auth, email, password);
-
+  
       if (username === '') {
         const usersRef = collection(db, 'usuarios');
         const q = query(usersRef, where('email', '==', email));
@@ -70,7 +84,7 @@ export const LoginScreen = ({ navigation }) => {
           username = userData.name;
         }
       }
-
+  
       setUsername(username);
       setEmail(email);
       navigation.navigate(ROUTES.INICIO);
@@ -85,6 +99,7 @@ export const LoginScreen = ({ navigation }) => {
       }
     }
   };
+  
 
   const navigateToRegister = () => {
     navigation.navigate(ROUTES.REGISTRO_USUARIO);
