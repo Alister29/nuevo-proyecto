@@ -49,7 +49,7 @@ export const LoginScreen = ({ navigation }) => {
     ) {
       setUsername("Administrador");
       setEmail(ADMIN_EMAIL);
-      navigation.navigate(ROUTES.ADMIN_HOME);
+      navigation.navigate("DrawerMenuAdmin");
       return;
     }
   
