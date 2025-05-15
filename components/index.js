@@ -1,2 +1,3 @@
 export * from "./TarjetaInicio";
-export * from "./TarjetaProgreso"
+export * from "./TarjetaMateria";
+export * from "./BarraProgreso";
