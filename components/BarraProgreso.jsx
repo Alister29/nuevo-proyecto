@@ -1,42 +1,42 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useContext } from "react";
+import { View, Text, StyleSheet } from "react-native";
 
-import { ThemeContext } from "../context"; 
+import { ThemeContext } from "../context";
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-  texto: {
-    marginBottom: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   barraBase: {
-    height: 16,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
-    overflow: 'hidden',
+    height: 24,
+    borderRadius: 10,
+    overflow: "hidden",
+    justifyContent: "center",
   },
   barraProgreso: {
-    height: '100%',
-    backgroundColor: '#4caf50',
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+  },
+  textoEnBarra: {
+    alignItems: "center",
+  },
+  textoPorcentaje: {
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
 
 export const BarraProgreso = ({ progreso, total }) => {
-  const porcentaje = progreso > 0 ? progreso / total : 0;
+  const { theme } = useContext(ThemeContext);
+  const porcentaje = `${Math.round(
+    (progreso > 0 ? progreso / total : 0) * 100
+  )}%`;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.texto}>
-        {`${progreso} / ${total}`}
-      </Text>
-      <View style={styles.barraBase}>
-        <View style={[styles.barraProgreso, { width: `${porcentaje * 100}%` }]} />
+    <View style={[styles.barraBase, {backgroundColor: theme.secondary}]}>
+      <View style={[styles.barraProgreso, { width: `${porcentaje}`, backgroundColor: theme.primary }]} />
+      <View style={styles.textoEnBarra}>
+        <Text style={styles.textoPorcentaje}>{porcentaje}</Text>
       </View>
     </View>
   );
-}
-
-
+};
