@@ -37,7 +37,10 @@ export const TarjetaMateria = ({ data, done, onLongPress }) => {
       </Text>
       <Text style={styles.text}>{codigo}</Text>
       {prereq.split(",").map((r, i) => (
-        <Text key={`${materia}-${prereq}-${i}`} style={styles.text}>
+        <Text
+          key={`${materia}-${prereq}-${i}`}
+          style={[styles.text, { color: theme.info }]}
+        >
           {r}
         </Text>
       ))}
