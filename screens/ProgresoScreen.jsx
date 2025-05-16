@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   ScrollView,
@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from "react-native";
 
-import { TarjetaMateria, BarraProgreso } from "../components";
+import { TarjetaMateria, BarraProgreso, Modal } from "../components";
 
 const { width, height } = Dimensions.get("window");
 
@@ -209,13 +209,36 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingRight: 40,
   },
+  modalTitle: {
+    textAlign: "center",
+  },
 });
 
 export const ProgresoScreen = () => {
   const { total, normales, electivas } = countSubjects(data);
+  const [viewInfo, setViewInfo] = useState(false);
+
+  const toggleInfo = () => {
+    setViewInfo(!viewInfo);
+  };
 
   return (
     <View style={styles.page}>
+      <Modal
+        isVisible={viewInfo}
+        closeFn={() => {
+          setViewInfo(false);
+        }}
+      >
+        <Text style={styles.modalTitle}>Detalles de Materia</Text>
+        <Text>Nombre:</Text>
+        <Text>Nivel:</Text>
+        <Text>Código:</Text>
+        <Text>Tipo:</Text>
+        <Text>Electiva:</Text>
+        <Text>Pre-Requisitos:</Text>
+      </Modal>
+
       <Text style={styles.career}>Carrera: {"Ing. de Sistemas"}</Text>
       <BarraProgreso progreso={2} total={total} />
       <ScrollView
@@ -233,9 +256,7 @@ export const ProgresoScreen = () => {
                       <TarjetaMateria
                         data={m}
                         key={`${nivel}-${m.materia}`}
-                        onLongPress={() => {
-                          console.log("pipipi");
-                        }}
+                        onLongPress={toggleInfo}
                       />
                     );
                   })}
