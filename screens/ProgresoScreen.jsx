@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   ScrollView,
@@ -9,168 +9,161 @@ import {
 } from "react-native";
 
 import { TarjetaMateria, BarraProgreso, Modal } from "../components";
+import * as pensumSrv from "../services/pensumService";
 
 const { width, height } = Dimensions.get("window");
 
-const countSubjects = (subjects) => {
+const countProgress = (subjects = {}, approved = []) => {
   let total = 0;
   let normales = 0;
+  let normAprobadas = 0;
   let electivas = 0;
+  let electAprobadas = 0;
 
   for (const values of Object.values(subjects)) {
     values.forEach((v) => {
       if (v.tipo === "Regular") normales++;
       if (v.tipo === "Electiva") electivas++;
       total++;
+      if (approved.includes(v.codigo)) {
+        if (v.tipo === "Regular") {
+          normAprobadas++;
+        } else {
+          electAprobadas++;
+        }
+      }
     });
   }
-  return { total, normales, electivas };
+  return { total, normales, electivas, normAprobadas, electAprobadas };
 };
 
-const data = {
-  A: [
-    {
-      codigo: "1803001",
-      materia: "Ingles I",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "-",
-    },
-    {
-      codigo: "2010010",
-      materia: "Introduccion a la Programación",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "-",
-    },
-    {
-      codigo: "2010140",
-      materia: "Metodologia Invertigacion y Tec Comunicación",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "-",
-    },
-  ],
-  B: [
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 1",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 2",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 3 ",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 4",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-  ],
-  C: [
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 10",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 20",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 30",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 4",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-  ],
-  D: [
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 100",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 200",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 300",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 400",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-  ],
-  E: [
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 01",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 02",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 03 ",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-    {
-      codigo: "1803001",
-      materia: "Elem. de Programación y Estruc. de Datos 04",
-      tipo: "Regular",
-      electiva: "No",
-      prereq: "2010010, 2010140",
-    },
-  ],
+const findPrereq = (materias, code) => {
+  for (const nivel of Object.values(materias)) {
+    const filter = nivel.filter((m) => m.codigo === code);
+    if (filter.length) {
+      return filter[0].materia;
+    }
+  }
+  return "No encontrado";
+};
+
+export const ProgresoScreen = () => {
+  const [viewInfo, setViewInfo] = useState(false);
+  const [info, setInfo] = useState({});
+  const [materias, setMaterias] = useState({});
+  const [aprobadas, setAprobadas] = useState(["2010140"]);
+  const [progreso, setProgreso] = useState({
+    total: 0,
+    normales: 0,
+    normAprobadas: 0,
+    electivas: 0,
+    electAprobadas: 0,
+  });
+
+  const cargarMaterias = () => {
+    pensumSrv.leerPensum("sistemas").then((data) => {
+      setMaterias(data);
+      setProgreso(countProgress(data, aprobadas));
+    });
+  };
+
+  useEffect(cargarMaterias, []);
+
+  const toggleInfo = (materia) => {
+    setInfo(materia);
+    setViewInfo(!viewInfo);
+  };
+
+  return (
+    <View style={styles.page}>
+      <Modal
+        isVisible={viewInfo}
+        closeFn={() => {
+          setViewInfo(false);
+        }}
+      >
+        <Text style={styles.modalTitle}>Detalles de Materia</Text>
+        <Text>Nivel: {info.nivel}</Text>
+        <Text>Nombre: {info.materia}</Text>
+        <Text>Código: {info.codigo}</Text>
+        <Text>Tipo: {info.tipo}</Text>
+        <Text>Electiva: {info.electiva}</Text>
+        <Text>Pre-Requisitos: {info.prereq?.replace('"', "")}</Text>
+        {info.prereq
+          ?.replace('"', "")
+          .split(",")
+          .map((p, i) => {
+            return (
+              <Text
+                style={styles.prereq}
+                key={`${info.materia}-${info.electiva}-${i}`}
+              >
+                {findPrereq(materias, p.trim())}
+              </Text>
+            );
+          })}
+      </Modal>
+
+      <Text style={styles.career}>Carrera: {"Ing. de Sistemas"}</Text>
+      <BarraProgreso progreso={2} total={progreso.total} />
+      <ScrollView
+        horizontal
+        style={[styles.viewer, { width: width - 20, height: height - 265 }]}
+      >
+        <ScrollView>
+          <View style={styles.list}>
+            {Object.entries(materias).map(([nivel, materias]) => {
+              return (
+                <View style={styles.entry} key={`nivel${nivel}`}>
+                  <Text>Nivel {nivel}</Text>
+                  {materias.map((m) => {
+                    return (
+                      <TarjetaMateria
+                        data={m}
+                        done={aprobadas.includes(m.codigo)}
+                        key={`${nivel}-${m.materia}`}
+                        onLongPress={() => {
+                          toggleInfo({ ...m, nivel });
+                        }}
+                      />
+                    );
+                  })}
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </ScrollView>
+
+      <View>
+        <Text>Numero total de Materias: {progreso.total}</Text>
+        <View style={styles.details}>
+          <View style={styles.column}>
+            <View style={styles.row}>
+              <Text>Normales:</Text>
+              <Text>{progreso.normales}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text>Aprobadas:</Text>
+              <Text>{`${progreso.normAprobadas}/${progreso.total}`}</Text>
+            </View>
+          </View>
+
+          <View style={styles.column}>
+            <View style={styles.row}>
+              <Text>Electivas:</Text>
+              <Text>{progreso.electivas}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text>Aprobadas:</Text>
+              <Text>{`${progreso.electAprobadas}/6`}</Text>
+            </View>
+          </View>
+        </View>
+        <Button title="Actualizar"></Button>
+      </View>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -212,88 +205,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     textAlign: "center",
   },
+  prereq: {
+    paddingLeft: 20,
+  },
 });
-
-export const ProgresoScreen = () => {
-  const { total, normales, electivas } = countSubjects(data);
-  const [viewInfo, setViewInfo] = useState(false);
-
-  const toggleInfo = () => {
-    setViewInfo(!viewInfo);
-  };
-
-  return (
-    <View style={styles.page}>
-      <Modal
-        isVisible={viewInfo}
-        closeFn={() => {
-          setViewInfo(false);
-        }}
-      >
-        <Text style={styles.modalTitle}>Detalles de Materia</Text>
-        <Text>Nombre:</Text>
-        <Text>Nivel:</Text>
-        <Text>Código:</Text>
-        <Text>Tipo:</Text>
-        <Text>Electiva:</Text>
-        <Text>Pre-Requisitos:</Text>
-      </Modal>
-
-      <Text style={styles.career}>Carrera: {"Ing. de Sistemas"}</Text>
-      <BarraProgreso progreso={2} total={total} />
-      <ScrollView
-        horizontal
-        style={[styles.viewer, { width: width - 20, height: height - 265 }]}
-      >
-        <ScrollView>
-          <View style={styles.list}>
-            {Object.entries(data).map(([nivel, materias]) => {
-              return (
-                <View style={styles.entry} key={`nivel${nivel}`}>
-                  <Text>Nivel {nivel}</Text>
-                  {materias.map((m) => {
-                    return (
-                      <TarjetaMateria
-                        data={m}
-                        key={`${nivel}-${m.materia}`}
-                        onLongPress={toggleInfo}
-                      />
-                    );
-                  })}
-                </View>
-              );
-            })}
-          </View>
-        </ScrollView>
-      </ScrollView>
-
-      <View>
-        <Text>Numero total de Materias: {total}</Text>
-        <View style={styles.details}>
-          <View style={styles.column}>
-            <View style={styles.row}>
-              <Text>Normales:</Text>
-              <Text>{normales}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text>Aprobadas:</Text>
-              <Text>{`2/${total}`}</Text>
-            </View>
-          </View>
-
-          <View style={styles.column}>
-            <View style={styles.row}>
-              <Text>Electivas:</Text>
-              <Text>{electivas}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text>Aprobadas:</Text>
-              <Text>{`0/6`}</Text>
-            </View>
-          </View>
-        </View>
-        <Button title="Actualizar"></Button>
-      </View>
-    </View>
-  );
-};
