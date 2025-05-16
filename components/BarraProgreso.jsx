@@ -27,7 +27,8 @@ const styles = StyleSheet.create({
 
 export const BarraProgreso = ({ progreso, total }) => {
   const { theme } = useContext(ThemeContext);
-  const percDec = progreso && total ? progreso / total : 0;
+  let percDec = progreso && total ? progreso / total : 0;
+  if (percDec > 1) percDec = 1;
   const porcentaje = `${Math.round(percDec * 100)}%`;
 
   return (

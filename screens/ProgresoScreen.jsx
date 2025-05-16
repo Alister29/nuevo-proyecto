@@ -81,6 +81,10 @@ export const ProgresoScreen = () => {
       : setAprobadas([...aprobadas, codigo]);
   };
 
+  const guardarCambios = () => {
+    setProgreso(countProgress(materias, aprobadas));
+  };
+
   return (
     <View style={styles.page}>
       <Modal
@@ -112,7 +116,10 @@ export const ProgresoScreen = () => {
       </Modal>
 
       <Text style={styles.career}>Carrera: {"Ing. de Sistemas"}</Text>
-      <BarraProgreso progreso={2} total={progreso.total} />
+      <BarraProgreso
+        progreso={progreso.normAprobadas + progreso.electAprobadas}
+        total={progreso.normales + 6}
+      />
       <ScrollView
         horizontal
         style={[styles.viewer, { width: width - 20, height: height - 265 }]}
@@ -171,7 +178,14 @@ export const ProgresoScreen = () => {
         </View>
         <Button
           title={editando ? "Guardar cambios" : "Actualizar"}
-          onPress={() => setEditando(!editando)}
+          onPress={
+            editando
+              ? () => {
+                  guardarCambios();
+                  setEditando(!editando);
+                }
+              : () => setEditando(!editando)
+          }
         />
       </View>
     </View>
