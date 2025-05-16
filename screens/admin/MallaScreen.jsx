@@ -5,6 +5,7 @@ import Papa from "papaparse";
 import { Picker } from "@react-native-picker/picker";
 import { Modal } from "../../components/Modal"; 
 import { subirPensum } from "../../services/pensumService";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const MallaScreen = () => {
   const [carrera, setCarrera] = useState("Ing. Sistemas");
@@ -82,22 +83,23 @@ export const MallaScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Seleccionar carrera</Text>
-      <Picker
-        selectedValue={carrera}
-        onValueChange={(val) => setCarrera(val)}
-        style={styles.picker}
-      >
-        <Picker.Item label="Ing. Sistemas" value="Ing. Sistemas" />
-        <Picker.Item label="Ing. Informática" value="Ing. Informática" />
-      </Picker>
+    <Text style={styles.labelMinimal}>Seleccionar carrera</Text>
+    <Picker
+      selectedValue={carrera}
+      onValueChange={(val) => setCarrera(val)}
+      style={styles.inputMinimal}
+    >
+      <Picker.Item label="Ing. Sistemas" value="Ing. Sistemas" />
+      <Picker.Item label="Ing. Informática" value="Ing. Informática" />
+    </Picker>
 
-      <Text style={styles.label}>Seleccionar CSV</Text>
-      <TouchableOpacity onPress={seleccionarArchivo} style={styles.botonExaminar}>
-        <Text style={styles.botonExaminarTexto}>
-          {fileName || "Examinar..."}
-        </Text>
-      </TouchableOpacity>
+    <Text style={styles.labelMinimal}>Seleccionar CSV</Text>
+    <TouchableOpacity onPress={seleccionarArchivo} style={styles.inputMinimalRow}>
+      <Icon name="paperclip" size={18} color="#555" style={{ marginRight: 8 }} />
+      <Text style={styles.fileText}>
+        {fileName || "Examinar..."}
+      </Text>
+    </TouchableOpacity>
 
       <Text style={styles.label}>Previsualización</Text>
       <View style={styles.previewContainer}>
@@ -174,6 +176,40 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#fff" },
   label: {marginTop: 10 },
   picker: { backgroundColor: "#f0f0f0", marginVertical: 5 },
+  labelMinimal: {
+    fontSize: 14,
+    marginBottom: 6,
+    color: '#333',
+    fontWeight: '500',
+  },
+
+  inputMinimal: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 3,
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 16,
+  },
+    inputMinimalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 16,
+  },
+
+  fileText: {
+    color: '#555',
+    fontSize: 14,
+  },
   botonExaminar: {
     backgroundColor: "#e0e0e0",
     padding: 10,
