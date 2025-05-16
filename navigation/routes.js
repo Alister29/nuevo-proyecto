@@ -10,7 +10,7 @@ export const ROUTES = {
   VER_DOCUMENTOS: "Ver documentos",
   ADMIN_HOME: "Home", // para el administrador
   ADMIN_HORARIO: "Horario",
-  ADMIN_MALLA: "Malla Curricular",
+  ADMIN_MALLA: "Subir malla curricular",
   ADMIN_EVENTOS: "Eventos",
   ADMIN_DOCUMENTOS: "Documentos",
   ADMIN_MAPA: "Mapa",
