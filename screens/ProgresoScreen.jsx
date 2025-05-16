@@ -59,6 +59,7 @@ export const ProgresoScreen = () => {
     electivas: 0,
     electAprobadas: 0,
   });
+  const [editando, setEditando] = useState(false);
 
   const cargarMaterias = () => {
     pensumSrv.leerPensum("sistemas").then((data) => {
@@ -72,6 +73,12 @@ export const ProgresoScreen = () => {
   const toggleInfo = (materia) => {
     setInfo(materia);
     setViewInfo(!viewInfo);
+  };
+
+  const updateAprovadas = (codigo) => {
+    aprobadas.includes(codigo)
+      ? setAprobadas(aprobadas.filter((c) => c !== codigo))
+      : setAprobadas([...aprobadas, codigo]);
   };
 
   return (
@@ -122,9 +129,11 @@ export const ProgresoScreen = () => {
                         data={m}
                         done={aprobadas.includes(m.codigo)}
                         key={`${nivel}-${m.materia}`}
-                        onLongPress={() => {
-                          toggleInfo({ ...m, nivel });
-                        }}
+                        onPress={
+                          editando
+                            ? () => updateAprovadas(m.codigo)
+                            : () => toggleInfo({ ...m, nivel })
+                        }
                       />
                     );
                   })}
@@ -160,7 +169,10 @@ export const ProgresoScreen = () => {
             </View>
           </View>
         </View>
-        <Button title="Actualizar"></Button>
+        <Button
+          title={editando ? "Guardar cambios" : "Actualizar"}
+          onPress={() => setEditando(!editando)}
+        />
       </View>
     </View>
   );
