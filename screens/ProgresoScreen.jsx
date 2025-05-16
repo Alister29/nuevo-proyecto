@@ -22,11 +22,11 @@ const countProgress = (subjects = {}, approved = []) => {
 
   for (const values of Object.values(subjects)) {
     values.forEach((v) => {
-      if (v.tipo === "Regular") normales++;
-      if (v.tipo === "Electiva") electivas++;
+      if (v.electiva === "NO") normales++;
+      else electivas++;
       total++;
       if (approved.includes(v.codigo)) {
-        if (v.tipo === "Regular") {
+        if (v.electiva === "NO") {
           normAprobadas++;
         } else {
           electAprobadas++;
@@ -38,20 +38,22 @@ const countProgress = (subjects = {}, approved = []) => {
 };
 
 const findPrereq = (materias, code) => {
+  console.log(code);
+  
   for (const nivel of Object.values(materias)) {
     const filter = nivel.filter((m) => m.codigo === code);
     if (filter.length) {
       return filter[0].materia;
     }
   }
-  return "No encontrado";
+  return "-";
 };
 
 export const ProgresoScreen = () => {
   const [viewInfo, setViewInfo] = useState(false);
   const [info, setInfo] = useState({});
   const [materias, setMaterias] = useState({});
-  const [aprobadas, setAprobadas] = useState(["2010140"]);
+  const [aprobadas, setAprobadas] = useState([]);
   const [progreso, setProgreso] = useState({
     total: 0,
     normales: 0,
@@ -62,7 +64,7 @@ export const ProgresoScreen = () => {
   const [editando, setEditando] = useState(false);
 
   const cargarMaterias = () => {
-    pensumSrv.leerPensum("sistemas").then((data) => {
+    pensumSrv.leerPensum("Ing. Sistemas").then((data) => {
       setMaterias(data);
       setProgreso(countProgress(data, aprobadas));
     });
@@ -101,8 +103,7 @@ export const ProgresoScreen = () => {
         <Text>Electiva: {info.electiva}</Text>
         <Text>Pre-Requisitos: {info.prereq?.replace('"', "")}</Text>
         {info.prereq
-          ?.replace('"', "")
-          .split(",")
+          ?.split(" ")
           .map((p, i) => {
             return (
               <Text
