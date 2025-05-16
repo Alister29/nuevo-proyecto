@@ -65,8 +65,11 @@ export const ProgresoScreen = () => {
 
   const cargarMaterias = () => {
     pensumSrv.leerPensum("Ing. Sistemas").then((data) => {
-      setMaterias(data);
-      setProgreso(countProgress(data, aprobadas));
+      const keys = Object.keys(data).sort();
+      const newMaterias = {};
+      keys.forEach(k => newMaterias[k] = data[k]);
+      setMaterias(newMaterias);
+      setProgreso(countProgress(newMaterias, aprobadas));
     });
   };
 
