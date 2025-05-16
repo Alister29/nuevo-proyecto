@@ -45,7 +45,7 @@ export const RootNavigator = () => {
         </>
       ) : (
         <>
-          <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
+          <Stack.Screen name={ROUTES.LOGIN} component={DrawerMenu} />
           <Stack.Screen name={ROUTES.REGISTRO_USUARIO} component={RegisterScreen} />
         </>
       )}
