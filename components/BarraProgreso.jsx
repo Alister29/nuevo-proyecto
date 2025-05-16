@@ -27,13 +27,17 @@ const styles = StyleSheet.create({
 
 export const BarraProgreso = ({ progreso, total }) => {
   const { theme } = useContext(ThemeContext);
-  const porcentaje = `${Math.round(
-    (progreso > 0 ? progreso / total : 0) * 100
-  )}%`;
+  const percDec = progreso && total ? progreso / total : 0;
+  const porcentaje = `${Math.round(percDec * 100)}%`;
 
   return (
-    <View style={[styles.barraBase, {backgroundColor: theme.secondary}]}>
-      <View style={[styles.barraProgreso, { width: `${porcentaje}`, backgroundColor: theme.primary }]} />
+    <View style={[styles.barraBase, { backgroundColor: theme.secondary }]}>
+      <View
+        style={[
+          styles.barraProgreso,
+          { width: `${porcentaje}`, backgroundColor: theme.primary },
+        ]}
+      />
       <View style={styles.textoEnBarra}>
         <Text style={styles.textoPorcentaje}>{porcentaje}</Text>
       </View>
