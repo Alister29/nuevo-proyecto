@@ -36,7 +36,6 @@ export const EventosScreen = () => {
   const [tipoSeleccionado, setTipoSeleccionado] = useState("todos");
   const [imagenVisible, setImagenVisible] = useState(false);
   const [imagenActual, setImagenActual] = useState(null);
-
   const [eventoExpandidoCarruselId, setEventoExpandidoCarruselId] = useState(null);
   const [expandidoId, setExpandidoId] = useState(null); // Para la lista
 
