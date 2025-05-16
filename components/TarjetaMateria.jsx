@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const TarjetaMateria = ({ data, done, onLongPress }) => {
+export const TarjetaMateria = ({ data, done, onPress, style, ...props }) => {
   const { theme } = useContext(ThemeContext);
 
   const { materia, codigo, prereq } = data;
@@ -31,7 +31,7 @@ export const TarjetaMateria = ({ data, done, onLongPress }) => {
   }
 
   return (
-    <Pressable style={customStyle} onLongPress={onLongPress}>
+    <Pressable style={[customStyle, style]} onPress={onPress} {...props}>
       <Text numberOfLines={1} ellipsizeMode="tail" style={styles.text}>
         {materia}
       </Text>
