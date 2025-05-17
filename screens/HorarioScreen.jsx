@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  View, Text, Button, Modal, ScrollView, StyleSheet, TouchableOpacity
+  View, Text, Button, Modal, ScrollView, StyleSheet, TouchableOpacity, Alert
 } from "react-native";
 import scheduleData from "../context/scheduleData";
 import { guardarHorarioEnFirebase, cargarHorarioDesdeFirebase } from "../database/firebaseFunctions";
@@ -13,47 +13,94 @@ const horas = [
   "15:45-17:15", "17:15-18:45", "18:45-20:15", "20:15-21:45"
 ];
 
+// Función para generar colores aleatorios por materia
+const getColorForSubject = (subject) => {
+  const colors = ["#FFCDD2", "#C8E6C9", "#BBDEFB", "#FFECB3", "#E1BEE7", "#D1C4E9", "#B2EBF2"];
+  return colors[subject.charCodeAt(0) % colors.length];
+};
+
 export const HorarioScreen = () => {
   const [materiasAsignadas, setMateriasAsignadas] = useState([]);
   const [modalMateriasVisible, setModalMateriasVisible] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState(null);
-  const [expandedSubject, setExpandedSubject] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState(null);
   const [docenteSeleccionado, setDocenteSeleccionado] = useState({});
+  const [materiaSeleccionada, setMateriaSeleccionada] = useState(null);
 
   useEffect(() => {
-    cargarHorarioDesdeFirebase(setMateriasAsignadas); // Cargar horario guardado en Firebase
+    cargarHorarioDesdeFirebase((materiasCargadas) => {
+      setMateriasAsignadas(materiasCargadas);
+      setDocenteSeleccionado(
+        materiasCargadas.reduce((acc, materia) => {
+          acc[materia.nombre] = { grupo: materia.grupo };
+          return acc;
+        }, {})
+      );
+    });
   }, []);
+  
+  const seleccionarMateria = (materia) => {
+    setSelectedSubject(selectedSubject === materia ? null : materia);
+  };
+  
 
-  // Manejo de selección y deselección de docente
+  // Manejo de selección de materia
   const seleccionarDocente = (materia, docente) => {
     const key = `${materia.nombre}-${docente.grupo}`;
-    const isAlreadyAssigned = materiasAsignadas.some(m => m.nombre === materia.nombre && m.grupo === docente.grupo);
+    const isAlreadyAssigned = docenteSeleccionado[materia.nombre]?.grupo === docente.grupo;
 
+    // ✅ Si el docente ya está asignado, permitir la deselección
     if (isAlreadyAssigned) {
-      setMateriasAsignadas(prev => prev.filter(m => m.nombre !== materia.nombre || m.grupo !== docente.grupo));
-      setDocenteSeleccionado(prev => {
-        const updated = { ...prev };
-        delete updated[key];
-        return updated;
-      });
-    } else {
-      const nuevosHorarios = docente.horarios.map(horario => ({
+        setMateriasAsignadas(prev => prev.filter(m => m.nombre !== materia.nombre || m.grupo !== docente.grupo));
+        setDocenteSeleccionado(prev => {
+            const updated = { ...prev };
+            delete updated[materia.nombre]; // ✅ Eliminar correctamente del estado
+            return updated;
+        });
+        return;
+    }
+
+    // ✅ Si otro docente ya está asignado en esta materia, bloquear la selección
+    if (docenteSeleccionado[materia.nombre]) {
+        Alert.alert("Error", "Solo puedes seleccionar un docente por materia.");
+        return;
+    }
+
+    // ✅ Asignar el nuevo docente con su grupo correctamente
+    setDocenteSeleccionado(prev => ({ ...prev, [materia.nombre]: { nombre: docente.nombre, grupo: docente.grupo } }));
+
+    const nuevosHorarios = docente.horarios.map(horario => ({
         nombre: materia.nombre,
         grupo: docente.grupo,
         dia: horario.dia,
         hora: horario.hora,
         aula: horario.aula,
-        aux: horario.aux 
-      }));
+        aux: horario.aux,
+        color: getColorForSubject(materia.nombre)
+    }));
 
-      setMateriasAsignadas(prev => [...prev, ...nuevosHorarios]);
-      setDocenteSeleccionado(prev => ({ ...prev, [key]: docente }));
-    }
+    setMateriasAsignadas(prev => [...prev, ...nuevosHorarios]);
+};
+
+
+
+  // Función para expandir/contraer niveles
+  const toggleLevel = (level) => {
+    setSelectedLevel(selectedLevel === level ? null : level);
+    setSelectedSubject(null); // Contraer materias al cambiar de nivel
   };
 
   return (
+    
     <View style={{ flex: 1, padding: 10 }}>
-      {/* Cuadrícula del Horario con formato corregido */}
+       {/* Mensaje de notificación al inicio */}
+      <View style={styles.notificationBox}>
+        <Text style={styles.notificationText}>
+         Ten en cuenta lo siguiente: solo puedes seleccionar un docente por materia, 
+         El símbolo ✳ antes de una materia significa que es una auxiliatura.
+        </Text>
+      </View>
+      {/* Cuadrícula del Horario con colores */}
       <ScrollView horizontal>
         <ScrollView>
           <View style={styles.scheduleContainer}>
@@ -70,15 +117,15 @@ export const HorarioScreen = () => {
                 <View style={styles.hourCell}><Text style={styles.hourText}>{hora}</Text></View>
                 {diasSemana.map((dia) => {
                   const assignments = materiasAsignadas.filter((a) => a.dia === dia && a.hora === hora);
-                  
+
                   return (
                     <View key={dia} style={[styles.cell, assignments.length > 1 && styles.cellChoque]}>
                       {assignments.length > 1 ? (
                         <Text style={styles.cellErrorText}>Existe un choque de horarios</Text>
                       ) : (
                         assignments.map((materia, index) => (
-                          <Text key={index} style={styles.cellText}>
-                            {materia.aux ? "✳" : ""}{materia.nombre} {materia.grupo} {materia.aula}
+                          <Text key={index} style={[styles.cellText, { backgroundColor: materia.color }]}>
+                            {materia.aux ? "✳ " : ""}{materia.nombre} {materia.aula} {materia.grupo}
                           </Text>
                         ))
                       )}
@@ -94,33 +141,40 @@ export const HorarioScreen = () => {
       <Button title="Ver Materias" onPress={() => setModalMateriasVisible(true)} />
       <Button title="Guardar horario" onPress={() => guardarHorarioEnFirebase(materiasAsignadas)} />
 
+      {/* Modal para seleccionar materias por nivel */}
       <Modal visible={modalMateriasVisible} animationType="slide">
         <View style={styles.modalContainer}>
           <ScrollView style={styles.modalScroll}>
             {Object.keys(scheduleData).map((level) => (
-              <TouchableOpacity key={level} onPress={() => setSelectedLevel(level)} style={styles.nivelTitulo}>
-                <Text style={styles.materiaTitulo}>{level}</Text>
-              </TouchableOpacity>
+              <View key={level}>
+                <TouchableOpacity onPress={() => toggleLevel(level)} style={styles.nivelTitulo}>
+                  <Text style={styles.materiaTitulo}>{level}</Text>
+                </TouchableOpacity>
+
+                {/* Si el nivel está expandido, mostrar sus materias debajo */}
+                {selectedLevel === level && (
+                  <View>
+                    {scheduleData[level]?.map((subject, index) => (
+                      <View key={index} style={styles.materiaContainer}>
+                        <TouchableOpacity onPress={() => seleccionarMateria(subject)}>
+                          <Text style={[styles.materiaTitulo, selectedSubject === subject && styles.materiaSeleccionada]}>
+                            {subject.nombre}
+                          </Text>
+                        </TouchableOpacity>
+
+                        {/* Si la materia está expandida, mostrar los docentes debajo */}
+                        {selectedSubject === subject && subject.docentes.map((docente, i) => (
+                          <TouchableOpacity key={i} onPress={() => seleccionarDocente(subject, docente)} style={styles.docenteItem}>
+                            <Text>{docente.grupo} {docente.nombre}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
             ))}
           </ScrollView>
-
-          {scheduleData[selectedLevel]?.map((subject, index) => (
-            <View key={index} style={styles.materiaContainer}>
-              <TouchableOpacity onPress={() => setExpandedSubject(expandedSubject === subject ? null : subject)}>
-                <Text style={styles.materiaTitulo}>{subject.nombre}</Text>
-              </TouchableOpacity>
-
-              {expandedSubject === subject && subject.docentes.map((docente, i) => (
-                <TouchableOpacity key={i} onPress={() => seleccionarDocente(subject, docente)} style={[
-                  styles.docenteItem,
-                  docenteSeleccionado[`${subject.nombre}-${docente.grupo}`] && styles.docenteSeleccionado
-                ]}>
-                  <Text>{docente.grupo} {docente.nombre}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
-
           <Button title="Cerrar" onPress={() => setModalMateriasVisible(false)} />
         </View>
       </Modal>
@@ -128,110 +182,31 @@ export const HorarioScreen = () => {
   );
 };
 
+
+// Estilos
 const styles = StyleSheet.create({
-  scheduleContainer: {
-    backgroundColor: "#E0F7FA",
-  },
-  headerRow: {
-    flexDirection: "row",
-    backgroundColor: "#B2EBF2",
-  },
-  headerCell: {
-    width: 120,  // Fijo igual que la columna de "Hora"
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 5,
-  },
-  hourCell: {
-    width: 120,
-    borderWidth: 1,
-    backgroundColor: "#B2EBF2",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 5,
-  },
-  headerText: {
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  row: {
-    flexDirection: "row",
-  },
-  cell: {
-    width: 120,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 5,
-    minHeight: 60,
-    flexWrap: 'wrap',
-  },
-  cellMateria: {
-    backgroundColor: "#80DEEA",
-  },
-  hourText: {
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  cellText: {
-    textAlign: "center",
-    fontSize: 12,
-  },
-  buttonContainer: {
-    marginTop: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "white",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  modalScroll: {
-    flex: 1,
-  },
-  nivelTitulo: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  materiaContainer: {
-    marginTop: 5,
-  },
-  materiaTitulo: {
-    fontSize: 16,
-    padding: 10,
-    backgroundColor: "#007AFF", // Azul
-    color: "white",
-  },
-  materiaSeleccionada: {
-    backgroundColor: "#005BB5", // Azul más oscuro al seleccionar
-  },
-  docenteLista: {
-    paddingLeft: 20,
-    marginTop: 5,
-  },
-  docenteItem: {
-    fontSize: 14,
-    paddingVertical: 5,
-    color: "white",
+  scheduleContainer: { backgroundColor: "#E0F7FA" },
+  headerRow: { flexDirection: "row", backgroundColor: "#B2EBF2" },
+  headerCell: { width: 120, borderWidth: 1, alignItems: "center", justifyContent: "center", padding: 5 },
+  hourCell: { width: 120, borderWidth: 1, backgroundColor: "#B2EBF2", alignItems: "center", justifyContent: "center", padding: 5 },
+  row: { flexDirection: "row" },
+  cell: { width: 120, borderWidth: 1, alignItems: "center", justifyContent: "center", padding: 5, minHeight: 60, flexWrap: 'wrap' },
+  cellChoque: { backgroundColor: "red" },
+  cellErrorText: { color: "white", fontWeight: "bold", textAlign: "center" },
+  modalContainer: { flex: 1, padding: 20, backgroundColor: "white" },
+  nivelTitulo: { fontSize: 18, fontWeight: "bold", marginTop: 10 },
+  materiaTitulo: { fontSize: 16, padding: 10, backgroundColor: "#007AFF", color: "white" },
+  materiaSeleccionada: { backgroundColor: "#005BB5" },
+  docenteItem: { fontSize: 14, paddingVertical: 5, color: "white", backgroundColor: "#007AFF", marginBottom: 2 },
+  notificationBox: {
     backgroundColor: "#007AFF",
-    marginBottom: 2,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
   },
-  docenteSeleccionado: {
-    fontWeight: "bold",
-    backgroundColor: "#005BB5",
-  },
-  cellChoque: {
-    backgroundColor: "red",
-  },
-  cellErrorText: {
+  notificationText: {
     color: "white",
-    fontWeight: "bold",
+    fontSize: 14,
     textAlign: "center",
   },
   
