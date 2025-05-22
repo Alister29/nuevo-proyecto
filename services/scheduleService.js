@@ -1,5 +1,5 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "./firebase"; 
+import { auth, db } from "../database"; 
 
 /**
  * Obtiene el horario guardado del usuario en Firebase.
