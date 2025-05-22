@@ -8,10 +8,10 @@ export const ROUTES = {
   MAPA: "Mapa",
   SUBIR_DOCUMENTOS: "Subir documentos",
   VER_DOCUMENTOS: "Ver documentos",
-  ADMIN_HOME: "Home", // para el administrador
-  ADMIN_HORARIO: "Horario",
-  ADMIN_MALLA: "Subir malla curricular",
-  ADMIN_EVENTOS: "Eventos",
-  ADMIN_DOCUMENTOS: "Documentos",
-  ADMIN_MAPA: "Mapa",
+  ADMIN_HOME: "Administrador", // para el administrador
+  ADMIN_SUBIR_HORARIOS: "Subir Horarios",
+  ADMIN_SUBIR_MALLA: "Subir malla curricular",
+  ADMIN_SUBIR_EVENTOS: "Subir Eventos",
+  ADMIN_APROBAR_DOCUMENTOS: "Aprobar Documentos",
+  ADMIN_ACTUALIZAR_MAPA: "Actualizar Mapa",
 };

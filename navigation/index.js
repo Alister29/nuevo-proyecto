@@ -1,3 +1,3 @@
 export * from "./DrawerMenu";
-export * from "./DrawerMenuAdmin";
+export * from "./RootNavigator";
 export * from "./routes";

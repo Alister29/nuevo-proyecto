@@ -1,4 +1,3 @@
-// Tu import original está bien. Solo quité la duplicación de deleteDoc.
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -25,7 +24,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
-import { db } from '../../database/firebase';
+import { db } from '../../database';
 import { getDoc } from "firebase/firestore";
 
 export const EventoScreen = () => {

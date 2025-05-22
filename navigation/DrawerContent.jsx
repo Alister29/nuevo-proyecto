@@ -4,8 +4,7 @@ import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 
 import { ROUTES } from "./routes";
-import { UserContext, ThemeContext } from "../context";
-import { getAuth, signOut } from "firebase/auth";
+import { AuthContext, ThemeContext } from "../context";
 
 const styles = StyleSheet.create({
   separator: {
@@ -23,6 +22,9 @@ const styles = StyleSheet.create({
   sesion: {
     fontWeight: "bold",
   },
+  subtitle :{
+    color: "gray",
+  },
   label: {
     paddingTop: 10,
   },
@@ -34,7 +36,10 @@ export const DrawerContent = ({ navigation, ...props }) => {
   const { routeNames, index } = props.state;
   const focused = routeNames[index];
   const { theme } = useContext(ThemeContext);
-  const { username, setUsername } = useContext(UserContext);
+  const { user, logout } = useContext(AuthContext);
+
+  const username = user ? user.username : "Usuario";
+  const subtitle = user ? "Usuario" : "Invitado";
 
   return (
     <DrawerContentScrollView {...props}>
@@ -42,21 +47,18 @@ export const DrawerContent = ({ navigation, ...props }) => {
         <Ionicons name="person-circle-outline" size={40} color="black" />
         <View style={styles.headerDetails}>
           <Text style={styles.sesion}>{username}</Text>
-          {username === "Usuario" && (
+          <Text style={styles.subtitle}>{subtitle}</Text>
+          {!user ? (
             <TouchableOpacity onPress={() => navigation.navigate(ROUTES.LOGIN)}>
               <Text style={{ ...styles.sesion, color: theme.primary }}>
                 Iniciar Sesion
               </Text>
             </TouchableOpacity>
-          )}
-          {username !== "Usuario" && (
+          ) : (
             <TouchableOpacity
               onPress={async () => {
-                const auth = getAuth();
                 try {
-                  await signOut(auth);
-                  setUsername("Usuario");
-                  navigation.navigate(ROUTES.LOGIN);
+                  logout();
                 } catch (error) {
                   console.error("Error al cerrar sesión:", error);
                 }
@@ -92,7 +94,9 @@ export const DrawerContent = ({ navigation, ...props }) => {
       </View>
       <DrawerItem
         label={ROUTES.HORARIO}
-        onPress={() => {navigation.navigate(ROUTES.HORARIO)}}
+        onPress={() => {
+          navigation.navigate(ROUTES.HORARIO);
+        }}
         focused={focused === ROUTES.HORARIO}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -105,7 +109,9 @@ export const DrawerContent = ({ navigation, ...props }) => {
       />
       <DrawerItem
         label={ROUTES.PROGRESO_ACADEMICO}
-        onPress={() => {navigation.navigate(ROUTES.PROGRESO_ACADEMICO)}}
+        onPress={() => {
+          navigation.navigate(ROUTES.PROGRESO_ACADEMICO);
+        }}
         focused={focused === ROUTES.PROGRESO_ACADEMICO}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -123,7 +129,9 @@ export const DrawerContent = ({ navigation, ...props }) => {
       </View>
       <DrawerItem
         label={ROUTES.EVENTOS}
-        onPress={() => {navigation.navigate(ROUTES.EVENTOS)}}
+        onPress={() => {
+          navigation.navigate(ROUTES.EVENTOS);
+        }}
         focused={focused === ROUTES.EVENTOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -136,7 +144,9 @@ export const DrawerContent = ({ navigation, ...props }) => {
       />
       <DrawerItem
         label={ROUTES.MAPA}
-        onPress={() => {navigation.navigate(ROUTES.MAPA)}}
+        onPress={() => {
+          navigation.navigate(ROUTES.MAPA);
+        }}
         focused={focused === ROUTES.MAPA}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -154,7 +164,9 @@ export const DrawerContent = ({ navigation, ...props }) => {
       </View>
       <DrawerItem
         label={ROUTES.SUBIR_DOCUMENTOS}
-        onPress={() => {navigation.navigate(ROUTES.SUBIR_DOCUMENTOS)}}
+        onPress={() => {
+          navigation.navigate(ROUTES.SUBIR_DOCUMENTOS);
+        }}
         focused={focused === ROUTES.SUBIR_DOCUMENTOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
@@ -167,7 +179,9 @@ export const DrawerContent = ({ navigation, ...props }) => {
       />
       <DrawerItem
         label={ROUTES.VER_DOCUMENTOS}
-        onPress={() => {navigation.navigate(ROUTES.VER_DOCUMENTOS)}}
+        onPress={() => {
+          navigation.navigate(ROUTES.VER_DOCUMENTOS);
+        }}
         focused={focused === ROUTES.VER_DOCUMENTOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
