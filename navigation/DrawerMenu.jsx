@@ -9,9 +9,8 @@ import {
   VerMapaScreen,
   SubirDocScreen,
   VerDocScreen,
-  LoginScreen,
-  RegisterScreen,
 } from "../screens";
+import { LoginScreen, RegisterScreen } from "../screens/auth";
 import { DrawerContent } from "./DrawerContent";
 import { ROUTES } from "./routes";
 import { ThemeContext } from "../context";

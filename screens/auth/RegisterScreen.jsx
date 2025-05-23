@@ -1,15 +1,27 @@
-import React, { useState, useContext } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  Platform,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
-import { UserContext } from "../../context";
+
+import { useAuth } from "../../context";
 import { ROUTES } from "../../navigation/routes";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../database/firebase";
-
 export const RegisterScreen = ({ navigation }) => {
-  const { setUsername } = useContext(UserContext);
+  const { user, loading, register } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigation.navigate(ROUTES.INICIO);
+    }
+  }, [user]);
 
   const [state, setState] = useState({
     name: "",
@@ -57,7 +69,8 @@ export const RegisterScreen = ({ navigation }) => {
       if (!value.trim()) {
         delete newErrors.contraseña;
       } else if (value.length < 6) {
-        newErrors.contraseña = " La contraseña debe tener al menos 6 caracteres.";
+        newErrors.contraseña =
+          " La contraseña debe tener al menos 6 caracteres.";
       } else {
         delete newErrors.contraseña;
       }
@@ -81,9 +94,12 @@ export const RegisterScreen = ({ navigation }) => {
     const newErrors = {};
 
     if (!name) newErrors.name = " El nombre de usuario es obligatorio.";
-    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = " El correo no es válido.";
-    if (contraseña.length < 6) newErrors.contraseña = " La contraseña debe tener al menos 6 caracteres.";
-    if (contraseña !== confirmarContraseña) newErrors.confirmarContraseña = " Las contraseñas no coinciden.";
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
+      newErrors.email = " El correo no es válido.";
+    if (contraseña.length < 6)
+      newErrors.contraseña = " La contraseña debe tener al menos 6 caracteres.";
+    if (contraseña !== confirmarContraseña)
+      newErrors.confirmarContraseña = " Las contraseñas no coinciden.";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -91,40 +107,31 @@ export const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      // Validar si ya existe un usuario con ese nombre
-      const qName = query(collection(db, "usuarios"), where("name", "==", name));
-      const querySnapshotName = await getDocs(qName);
-    
-      if (!querySnapshotName.empty) {
-        setErrors({ ...errors, name: "El nombre de usuario ya está registrado." });
-        return;
+      await register(email, contraseña, name);
+
+      if (Platform.OS === "web") {
+        alert("Usuario registrado correctamente.");
+      } else {
+        Alert.alert("Éxito", "Usuario registrado correctamente.");
       }
-    
-      // Validar si ya existe un usuario con ese correo
-      const qEmail = query(collection(db, "usuarios"), where("email", "==", email));
-      const querySnapshotEmail = await getDocs(qEmail);
-    
-      if (!querySnapshotEmail.empty) {
-        setErrors({ ...errors, email: "El correo ya está registrado." });
-        return;
-      }
-
-      // Crear cuenta en Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, contraseña);
-      const user = userCredential.user;
-
-      // Guardar en Firestore
-      await addDoc(collection(db, "usuarios"), {
-        authid: user.uid,
-        name,
-        email,
-      });
-
-      Alert.alert("Éxito", "Usuario registrado correctamente.");
-      setUsername(name);
-      navigation.navigate(ROUTES.INICIO);
     } catch (error) {
-      Alert.alert("Error", error.message);
+      switch (error.code) {
+        case "auth/username-already-in-use":
+          setErrors({ ...errors, name: error.message });
+          break;
+        case "auth/email-already-in-use":
+          setErrors({ ...errors, email: error.message });
+          break;
+        case "auth/invalid-email":
+          setErrors({ ...errors, email: error.message });
+          break;
+        default:
+          if (Platform.OS === "web") {
+            alert(error.message);
+          } else {
+            Alert.alert("Error", error.message);
+          }
+      }
     }
   };
 
@@ -158,10 +165,16 @@ export const RegisterScreen = ({ navigation }) => {
           onChangeText={(value) => handleChangeText("contraseña", value)}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color="#444" />
+          <Ionicons
+            name={showPassword ? "eye-off" : "eye"}
+            size={24}
+            color="#444"
+          />
         </TouchableOpacity>
       </View>
-      {errors.contraseña && <Text style={styles.errorText}>{errors.contraseña}</Text>}
+      {errors.contraseña && (
+        <Text style={styles.errorText}>{errors.contraseña}</Text>
+      )}
 
       <View style={styles.passwordContainer}>
         <TextInput
@@ -169,17 +182,29 @@ export const RegisterScreen = ({ navigation }) => {
           placeholder="Confirmar contraseña"
           secureTextEntry={!showConfirmPassword}
           placeholderTextColor="#444"
-          onChangeText={(value) => handleChangeText("confirmarContraseña", value)}
+          onChangeText={(value) =>
+            handleChangeText("confirmarContraseña", value)
+          }
         />
-        <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-          <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={24} color="#444" />
+        <TouchableOpacity
+          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+        >
+          <Ionicons
+            name={showConfirmPassword ? "eye-off" : "eye"}
+            size={24}
+            color="#444"
+          />
         </TouchableOpacity>
       </View>
       {errors.confirmarContraseña && (
         <Text style={styles.errorText}>{errors.confirmarContraseña}</Text>
       )}
 
-      <TouchableOpacity style={styles.button} onPress={saveNewUser}>
+      <TouchableOpacity
+        style={[styles.button, loading && styles.disabled]}
+        onPress={saveNewUser}
+        disabled={loading}
+      >
         <Text style={styles.buttonText}>Registrarse</Text>
       </TouchableOpacity>
 
@@ -204,16 +229,16 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   input: {
-    backgroundColor: '#ECF4F9',
+    backgroundColor: "#ECF4F9",
     padding: 15,
     borderRadius: 15,
     marginBottom: 15,
     fontSize: 16,
   },
   passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ECF4F9',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ECF4F9",
     borderRadius: 15,
     paddingHorizontal: 10,
     marginBottom: 15,
@@ -224,7 +249,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#69C7F9',
+    backgroundColor: "#69C7F9",
     padding: 15,
     borderRadius: 25,
     alignItems: "center",
@@ -236,11 +261,14 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: "#007BFF",
-    textAlign: "left"
+    textAlign: "left",
   },
   errorText: {
     color: "red",
     marginBottom: 10,
     fontSize: 14,
+  },
+  disabled: {
+    backgroundColor: "#ccc",
   },
 });

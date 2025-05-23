@@ -3,9 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 
-import { ROUTES } from "./routes";
-import { UserContext, ThemeContext } from "../context";
-import { getAuth, signOut } from "firebase/auth";
+import { ROUTES } from "../routes";
+import { AuthContext, ThemeContext } from "../../context";
 
 const styles = StyleSheet.create({
   separator: {
@@ -34,29 +33,19 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
   const { routeNames, index } = props.state;
   const focused = routeNames[index];
   const { theme } = useContext(ThemeContext);
-  const { username, setUsername } = useContext(UserContext);
+  const { user, logout } = useContext(AuthContext);
 
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.header}>
         <Ionicons name="person-circle-outline" size={40} color="black" />
         <View style={styles.headerDetails}>
-          <Text style={styles.sesion}>{username}</Text>
-          {username === "Usuario" && (
-            <TouchableOpacity onPress={() => navigation.navigate(ROUTES.LOGIN)}>
-              <Text style={{ ...styles.sesion, color: theme.primary }}>
-                Iniciar Sesion
-              </Text>
-            </TouchableOpacity>
-          )}
-          {username !== "Usuario" && (
-            <TouchableOpacity
+          <Text style={styles.sesion}>{user.username}</Text>
+          <Text style={styles.sesion}>Administrador</Text>
+          <TouchableOpacity
               onPress={async () => {
-                const auth = getAuth();
                 try {
-                  await signOut(auth);
-                  setUsername("Usuario");
-                  navigation.navigate(ROUTES.LOGIN);
+                  logout();
                 } catch (error) {
                   console.error("Error al cerrar sesión:", error);
                 }
@@ -66,12 +55,11 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
                 Cerrar Sesion
               </Text>
             </TouchableOpacity>
-          )}
         </View>
       </View>
 
       <DrawerItem
-        label="Home"
+        label={ROUTES.ADMIN_HOME}
         onPress={() => {
           navigation.navigate(ROUTES.ADMIN_HOME);
         }}
@@ -91,9 +79,11 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
         <Text style={styles.label}>Carreras</Text>
       </View>
       <DrawerItem
-        label="Subir malla curricular"
-        onPress={() => {navigation.navigate(ROUTES.ADMIN_MALLA)}}
-        focused={focused === ROUTES.ADMIN_MALLA}
+        label={ROUTES.ADMIN_SUBIR_MALLA}
+        onPress={() => {
+          navigation.navigate(ROUTES.ADMIN_SUBIR_MALLA);
+        }}
+        focused={focused === ROUTES.ADMIN_SUBIR_MALLA}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
           <Ionicons
@@ -104,9 +94,11 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
         )}
       />
       <DrawerItem
-        label="Subir horarios"
-        onPress={() => {navigation.navigate(ROUTES.ADMIN_HORARIO)}}
-        focused={focused === ROUTES.ADMIN_HORARIO}
+        label={ROUTES.ADMIN_SUBIR_HORARIOS}
+        onPress={() => {
+          navigation.navigate(ROUTES.ADMIN_SUBIR_HORARIOS);
+        }}
+        focused={focused === ROUTES.ADMIN_SUBIR_HORARIOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
           <Ionicons
@@ -122,9 +114,11 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
         <Text style={styles.label}>Universidad</Text>
       </View>
       <DrawerItem
-        label="Subir eventos"
-        onPress={() => {navigation.navigate(ROUTES.ADMIN_EVENTOS)}}
-        focused={focused === ROUTES.ADMIN_EVENTOS}
+        label={ROUTES.ADMIN_SUBIR_EVENTOS}
+        onPress={() => {
+          navigation.navigate(ROUTES.ADMIN_SUBIR_EVENTOS);
+        }}
+        focused={focused === ROUTES.ADMIN_SUBIR_EVENTOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
           <Ionicons
@@ -135,9 +129,11 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
         )}
       />
       <DrawerItem
-        label="Actualizar mapa"
-        onPress={() => {navigation.navigate(ROUTES.ADMIN_MAPA)}}
-        focused={focused === ROUTES.ADMIN_MAPA}
+        label={ROUTES.ADMIN_ACTUALIZAR_MAPA}
+        onPress={() => {
+          navigation.navigate(ROUTES.ADMIN_ACTUALIZAR_MAPA);
+        }}
+        focused={focused === ROUTES.ADMIN_ACTUALIZAR_MAPA}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
           <Ionicons
@@ -153,9 +149,11 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
         <Text style={styles.label}>Usuarios</Text>
       </View>
       <DrawerItem
-        label="Aprobar documentos"
-        onPress={() => {navigation.navigate(ROUTES.ADMIN_DOCUMENTOS)}}
-        focused={focused === ROUTES.ADMIN_DOCUMENTOS}
+        label={ROUTES.ADMIN_APROBAR_DOCUMENTOS}
+        onPress={() => {
+          navigation.navigate(ROUTES.ADMIN_APROBAR_DOCUMENTOS);
+        }}
+        focused={focused === ROUTES.ADMIN_APROBAR_DOCUMENTOS}
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
           <Ionicons
@@ -165,7 +163,6 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
           />
         )}
       />
-      
     </DrawerContentScrollView>
   );
 };
