@@ -17,7 +17,7 @@ const puntos = [
   { id: 13, nombre: "Aula 612", x: 385, y: 280, descripcion: "Aula comun, CEQA", imagen: require("../assets/13.jpeg") },
   { id: 14, nombre: "Departamento de Biologia", x: 330, y: 330, descripcion: "606 Aula Auditorio Biologia 1er piso, Planta baja-(608 Aula Lab. Biologia 2, 609 Aula Lab. Biologia 3, 608A Aula Lab. Biologia 4, 608B Aula Lab. Biologia 5, 609A Aula Lab. Biologia 6), ULRA", imagen: require("../assets/14.jpeg") },
   { id: 15, nombre: "Edificio Elektro", x: 268, y: 312, descripcion: "Planta baja(Aula lab. 667A Elektro 1, 667B Elektro 2, 668 Elektro 3), 1er Piso(Aula lab. 669A Elektro 4, 669B Elektro 5, 670 Elektro 6), 2do Piso 671B Aula proyectos,(Aula lab. 671 Elektro 7, 671A Elektro 8, 671C Elektro 10, 672 Elektro 11), 3er Piso(674A Aula Telecomunicaciones, 674B Aula Control, 675 Sala de Tesistas)", imagen: require("../assets/15.jpeg") },
-  { id: 16, nombre: "Lab. Simulacion Metodos y Seguridad", x: 232, y: 263, descripcion: "Dpt. de Electrica y Electronica", imagen: require("../assets/16.jpeg") },
+  { id: 16, nombre: "Lab. Simulacion Metodos y Seguridad", x: 232, y: 263, descripcion: "", imagen: require("../assets/16.jpeg") },
   { id: 17, nombre: "Aula 624", x: 258, y: 261, descripcion: "Aula comun", imagen: require("../assets/17.jpeg") },
   { id: 18, nombre: "Aula 623", x: 250, y: 225, descripcion: "Aula comun, CEIME, CEMAT", imagen: require("../assets/18.jpeg") },
   { id: 19, nombre: "Biblioteca Fcyt-Planta baja y primer piso", x: 222, y: 155, descripcion: "625C aula comun-2do piso, 625D aula comun-2do piso, CAE", imagen: require("../assets/19.jpeg") },
