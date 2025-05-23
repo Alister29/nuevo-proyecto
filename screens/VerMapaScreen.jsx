@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Image, TouchableOpacity, Text, StyleSheet, ScrollView, Modal } from "react-native";
+import { View, Image, TouchableOpacity, Text, StyleSheet, ScrollView, TextInput, FlatList } from "react-native";
 
 const puntos = [
   { id: 1, nombre: "Bloque Central", x: 335, y: 255, descripcion: "Decanato, Direccion Academica, Kardex, Secretaria Administrativa, Dpt. Civil, Caja, CPD, CEF, CEIS, Gabinete y Auditorio Mecanica, PESEE, Planta baja-(Aula 651, Aula 652).", imagen: require("../assets/1.jpeg") },
@@ -52,12 +52,53 @@ const puntos = [
   { id: 48, nombre: "Canchas polifuncionales", x: 448, y: 243, descripcion: "", imagen: require("../assets/48.jpeg") },
   { id: 49, nombre: "Aulas 660 y 661", x: 170, y: 313, descripcion: "", imagen: require("../assets/49.jpeg") },
 ];
-
 const VerMapaScreen = () => {
   const [info, setInfo] = useState(null);
+  const [busqueda, setBusqueda] = useState("");
+  const [resultados, setResultados] = useState([]);
+
+  const buscarLugar = (texto) => {
+    setBusqueda(texto);
+    
+    if (texto.trim().length === 0) {
+      setResultados([]);
+      return;
+    }
+
+    const textoNormalizado = texto.toLowerCase();
+    const coincidencias = puntos.filter(punto =>
+      punto.nombre.toLowerCase().includes(textoNormalizado) ||
+      punto.descripcion.toLowerCase().includes(textoNormalizado)
+    );
+
+    setResultados(coincidencias);
+  };
 
   return (
     <View style={styles.contenedor}>
+      {/* Barra de búsqueda */}
+      <TextInput
+        style={styles.inputBusqueda}
+        placeholder="Buscar lugares..."
+        value={busqueda}
+        onChangeText={buscarLugar}
+      />
+
+      {/* Lista de resultados de búsqueda debajo de la barra de búsqueda */}
+      {resultados.length > 0 && (
+        <FlatList
+          data={resultados}
+          keyExtractor={(item) => item.id.toString()}
+          style={styles.listaResultados}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => { setInfo(item); setBusqueda(""); setResultados([]); }}>
+              <Text style={styles.resultadoTexto}>{item.nombre}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
+
+      {/* ScrollView con mapa */}
       <ScrollView horizontal={true} vertical={true} contentContainerStyle={styles.scrollContainer}>
         <Image source={require("../assets/MapaUni2d.png")} style={styles.mapa} />
         {puntos.map((punto) => (
@@ -69,23 +110,38 @@ const VerMapaScreen = () => {
         ))}
       </ScrollView>
 
-      {/* Modal para mostrar detalles del punto seleccionado */}
-      <Modal visible={!!info} transparent={true} animationType="slide">
+      {/* Modal de información del lugar */}
+      {info && (
         <View style={styles.modal}>
-          <Text style={styles.titulo}>{info?.nombre}</Text>
-          <Image source={info?.imagen} style={styles.imagenLugar} />
-          <Text style={styles.descripcion}>{info?.descripcion}</Text>
+          <Text style={styles.titulo}>{info.nombre}</Text>
+          <Image source={info.imagen} style={styles.imagenLugar} />
+          <Text style={styles.descripcion}>{info.descripcion}</Text>
           <TouchableOpacity onPress={() => setInfo(null)} style={styles.cerrar}>
             <Text>Cerrar</Text>
           </TouchableOpacity>
         </View>
-      </Modal>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  contenedor: { flex: 1 },
+  contenedor: { flex: 1, padding: 10 },
+  inputBusqueda: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10
+  },
+  listaResultados: {
+    backgroundColor: "#fff",
+    padding: 5,
+    borderRadius: 5,
+    maxHeight: 150
+  },
+  resultadoTexto: { padding: 10, fontSize: 16 },
   scrollContainer: { flexDirection: "column", alignItems: "center" },
   mapa: {
     width: 800, // Tamaño original
@@ -109,7 +165,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   titulo: { fontSize: 20, fontWeight: "bold" },
-  imagenLugar: { width: "100%", height: 150, resizeMode: "contain" },
+  imagenLugar: { width: "100%", height: 200, resizeMode: "contain", borderRadius: 10 },
   descripcion: { marginTop: 10 },
   cerrar: { marginTop: 20, alignSelf: "center", padding: 10, backgroundColor: "#ddd", borderRadius: 5 },
 });
