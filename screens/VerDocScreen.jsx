@@ -21,13 +21,28 @@ const mockData = [
   {
     materia: "Calculo I",
     categoria: "apuntes",
-    titulo: "Apuntes de calculo",
+    titulo: "Apuntes de calculo I",
     usuario: "Usuario",
     archivos: [
       { nombre: "cap1.pdf", peso: "600kb", uri: "/base64:" },
       { nombre: "cap2.pdf", peso: "750kb", uri: "/base64:" },
     ],
     fecha: "20-03-2025",
+    aprobado: true,
+    mensaje: "",
+  },
+  {
+    materia: "Calculo II",
+    categoria: "apuntes",
+    titulo: "Apuntes de calculo II",
+    usuario: "Usuario",
+    archivos: [
+      { nombre: "cap1.pdf", peso: "600kb", uri: "/base64:" },
+      { nombre: "cap2.pdf", peso: "750kb", uri: "/base64:" },
+    ],
+    fecha: "20-03-2025",
+    aprobado: false,
+    mensaje: "No apto para publicación",
   },
 ];
 
@@ -156,7 +171,7 @@ const ResultsSection = ({ rows, entry, action }) => {
                 action(r);
               }}
             >
-              <Text style={styles.col1}>{r.materia}</Text>
+              <Text style={styles.col1}>{r.titulo}</Text>
               <Text style={styles.col2}>{r.usuario}</Text>
               <Text style={styles.col3}>▶</Text>
             </TouchableOpacity>
