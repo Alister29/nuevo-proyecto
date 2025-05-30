@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import {
-  getFirestore,
+ 
   collection,
   addDoc,
   updateDoc,
@@ -24,8 +24,8 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
-import { db } from '../../database';
-import { getDoc } from "firebase/firestore";
+import { db } from '../../database'; // Asegúrate de que la ruta sea correcta
+
 
 export const EventoScreen = () => {
   const [titulo, setTitulo] = useState("");
