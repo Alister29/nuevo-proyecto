@@ -181,3 +181,124 @@ export const DocumentoScreen = () => {
     </View>
   );
 };
+
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    backgroundColor: "#fff",
+    flex: 1,
+  },
+  tabContainer: {
+    marginBottom: 5,
+  },
+  field: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  fieldLabel: {
+    width: 100,
+    fontSize: 14,
+    color: "#333",
+  },
+  resultsLabel: {
+    fontWeight: "bold",
+    fontSize: 14,
+    marginBottom: 6,
+    paddingLeft: 4,
+    paddingBottom: 10,
+    color: "#333",
+  },
+  resultsContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    overflow: "hidden",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 5,
+  },
+  headerRow: {
+    backgroundColor: "#e0e0e0",
+  },
+  col1: {
+    width: "50%",
+    paddingLeft: 4,
+  },
+  col2: {
+    width: "30%",
+    paddingLeft: 15,
+  },
+  col3: {
+    width: "20%",
+    paddingLeft: 4,
+    textAlign: "center",
+  },
+  btnAzul: {
+    backgroundColor: "#69C7F9",
+    padding: 13,
+    borderRadius: 25,
+    alignItems: "center",
+    marginTop: 15,
+  },
+  btnRojo: {
+    backgroundColor: "#FF6767",
+    padding: 13,
+    borderRadius: 25,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  btnGris: {
+    backgroundColor: "#D1DEEA",
+    padding: 13,
+    borderRadius: 25,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  btnText: {
+    textAlign: "center",
+    color: "#000",
+    fontSize: 15,
+  },
+  modalButton: {
+    padding: 12,
+    borderRadius: 12,
+    width: 100,
+    alignItems: "center",
+  },  
+  modalContainer: {
+    padding: 24,
+    margin: 16,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  modalContainerRechazo: {
+    padding: 10,
+    margin: 10,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButtonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+  },
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
+    textAlignVertical: "top",
+  },
+});
