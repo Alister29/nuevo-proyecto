@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  TextInput,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Dimensions, ScrollView, TextInput} from "react-native";
 import { Modal } from "../../components/Modal"; 
 import { db } from "../../database";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";

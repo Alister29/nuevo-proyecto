@@ -41,7 +41,7 @@ export const InicioScreen = ({ navigation }) => {
           titulo={"Documentos"}
           icono={"folder-outline"}
           detalle={"Aprobar Documentos"}
-          onPress={() => {navigation.navigate(ROUTES.EVENTOS)}}
+          onPress={() => {navigation.navigate(ROUTES.ADMIN_APROBAR_DOCUMENTOS)}}
         />
       </View>
     </View>
