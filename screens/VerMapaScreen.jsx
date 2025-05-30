@@ -52,7 +52,7 @@ const puntos = [
   { id: 48, nombre: "Canchas polifuncionales", x: 448, y: 243, descripcion: "", imagen: require("../assets/48.jpeg") },
   { id: 49, nombre: "Aulas 660 y 661", x: 170, y: 313, descripcion: "", imagen: require("../assets/49.jpeg") },
 ];
-const VerMapaScreen = () => {
+export const VerMapaScreen = () => {
   const [info, setInfo] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);

@@ -128,21 +128,6 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
           />
         )}
       />
-      <DrawerItem
-        label={ROUTES.ADMIN_ACTUALIZAR_MAPA}
-        onPress={() => {
-          navigation.navigate(ROUTES.ADMIN_ACTUALIZAR_MAPA);
-        }}
-        focused={focused === ROUTES.ADMIN_ACTUALIZAR_MAPA}
-        activeBackgroundColor={theme.secondary}
-        icon={({ focused, color, size }) => (
-          <Ionicons
-            name={focused ? "location" : "location-outline"}
-            size={size}
-            color={color}
-          />
-        )}
-      />
       <Separator />
 
       <View>
@@ -157,7 +142,7 @@ export const DrawerContentAdmin = ({ navigation, ...props }) => {
         activeBackgroundColor={theme.secondary}
         icon={({ focused, color, size }) => (
           <Ionicons
-            name={focused ? "cloud-upload" : "cloud-upload-outline"}
+            name={focused ? "folder" : "folder-outline"}
             size={size}
             color={color}
           />
