@@ -12,6 +12,6 @@ export const ROUTES = {
   ADMIN_SUBIR_HORARIOS: "Subir Horarios",
   ADMIN_SUBIR_MALLA: "Subir malla curricular",
   ADMIN_SUBIR_EVENTOS: "Subir Eventos",
-  ADMIN_APROBAR_DOCUMENTOS: "Aprobar Documentos",
+  ADMIN_APROBAR_DOCUMENTOS: "Aprobar documentos",
   ADMIN_ACTUALIZAR_MAPA: "Actualizar Mapa",
 };
