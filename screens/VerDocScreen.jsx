@@ -14,37 +14,9 @@ import { Picker } from "@react-native-picker/picker";
 import { useAuth } from "../context";
 import { Modal } from "../components";
 import { COLLECTIONS } from "../database";
+import { searchDocuments, uploadDocuments } from "../services";
 
-const mockSubjects = ["Calculo I"];
-
-const mockData = [
-  {
-    materia: "Calculo I",
-    categoria: "apuntes",
-    titulo: "Apuntes de calculo I",
-    usuario: "Usuario",
-    archivos: [
-      { nombre: "cap1.pdf", peso: "600kb", uri: "/base64:" },
-      { nombre: "cap2.pdf", peso: "750kb", uri: "/base64:" },
-    ],
-    fecha: "20-03-2025",
-    aprobado: true,
-    mensaje: "",
-  },
-  {
-    materia: "Calculo II",
-    categoria: "apuntes",
-    titulo: "Apuntes de calculo II",
-    usuario: "Usuario",
-    archivos: [
-      { nombre: "cap1.pdf", peso: "600kb", uri: "/base64:" },
-      { nombre: "cap2.pdf", peso: "750kb", uri: "/base64:" },
-    ],
-    fecha: "20-03-2025",
-    aprobado: false,
-    mensaje: "No apto para publicación",
-  },
-];
+const mockSubjects = ["Calculo I", "Algebra II"];
 
 const SearchTab = (props) => {
   const {
@@ -88,9 +60,8 @@ const SearchTab = (props) => {
             mode="dialog"
           >
             <Picker.Item
-              label="Categoria (Opcional)"
-              value=""
-              enabled={false}
+              label="Todas"
+              value="none"
             />
             {COLLECTIONS.DOCUMENT_CATEGORIES.map((c) => (
               <Picker.Item label={c} value={c} key={c} />
@@ -161,6 +132,7 @@ const ResultsSection = ({ rows, entry, action }) => {
         <Text style={styles.col2}>{headers[1]}</Text>
         <Text style={styles.col3}>{headers[2]}</Text>
       </View>
+      {!rows.length && <Text style={styles.centerText}>No hay resultados</Text>}
       {!entry &&
         rows?.map((r, i) => {
           return (
@@ -203,10 +175,38 @@ export const VerDocScreen = () => {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
 
-  const [entry, setEntry] = useState(null);
-  const [searchResults, setSearchResults] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
-  const buscar = async () => {};
+  const [entry, setEntry] = useState(null);
+  const [searching, setSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+
+  const buscar = async () => {
+    if (!subject) {
+      showMessage("Selecciona una materia");
+      return;
+    }
+    
+    setSearching(true);
+    try{
+      const newSearchResults = await searchDocuments(subject, category);
+
+      console.log(newSearchResults);
+      
+      setSearchResults(newSearchResults);
+    }
+    catch(error){
+      console.error(error.message);
+    }
+
+    setSearching(false);
+  };
+
+  const showMessage = (message) => {
+    setModalMessage(message);
+    setShowModal(true);
+  };
 
   return (
     <View style={styles.container}>
@@ -227,6 +227,7 @@ export const VerDocScreen = () => {
       <Button
         title={viewEntry ? "Volver a los resultados" : "Buscar"}
         onPress={viewEntry ? () => setViewEntry(false) : buscar}
+        disabled={searching}
       ></Button>
 
       <Text style={styles.resultsLabel}>
@@ -234,7 +235,7 @@ export const VerDocScreen = () => {
       </Text>
 
       <ResultsSection
-        rows={viewEntry ? entry : mockData}
+        rows={viewEntry ? entry : searchResults}
         entry={viewEntry}
         action={
           viewEntry
@@ -245,6 +246,9 @@ export const VerDocScreen = () => {
               }
         }
       />
+      <Modal isVisible={showModal} closeFn={() => setShowModal(false)}>
+        <Text style={styles.centerText}>{modalMessage}</Text>
+      </Modal>
     </View>
   );
 };
@@ -253,6 +257,9 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 5,
     paddingHorizontal: 10,
+  },
+  centerText: {
+    textAlign: "center",
   },
   tabContainer: {
     height: 180,
