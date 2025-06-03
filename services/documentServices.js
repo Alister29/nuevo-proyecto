@@ -1,12 +1,4 @@
-import {
-  doc,
-  addDoc,
-  getDoc,
-  query,
-  where,
-  collection,
-  getDocs,
-} from "firebase/firestore";
+import { addDoc, query, where, collection, getDocs } from "firebase/firestore";
 
 import { db, COLLECTIONS } from "../database";
 
@@ -27,11 +19,12 @@ export const uploadDocuments = async (documents) => {
 };
 
 export const searchDocuments = async (materia, categoria = "") => {
-  console.log(materia, categoria);
-
   try {
     const collRef = collection(db, COLLECTIONS.DOCUMENTS);
-    const filters = [where("materia", "==", materia)];
+    const filters = [
+      where("aprobado", "==", true),
+      where("materia", "==", materia),
+    ];
 
     if (categoria && categoria.trim() && categoria !== "none") {
       filters.push(where("categoria", "==", categoria));
