@@ -10,13 +10,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-
-import { useAuth } from "../context";
-import { Modal } from "../components";
+import { Modal, ViewPDF } from "../components";
 import { COLLECTIONS } from "../database";
-import { searchDocuments, uploadDocuments } from "../services";
-
-const mockSubjects = ["Calculo I", "Algebra II"];
+import { searchDocuments } from "../services";
 
 const SearchTab = (props) => {
   const {
@@ -59,10 +55,7 @@ const SearchTab = (props) => {
             onValueChange={(val) => setCategory(val)}
             mode="dialog"
           >
-            <Picker.Item
-              label="Todas"
-              value="none"
-            />
+            <Picker.Item label="Todas" value="none" />
             {COLLECTIONS.DOCUMENT_CATEGORIES.map((c) => (
               <Picker.Item label={c} value={c} key={c} />
             ))}
@@ -82,6 +75,24 @@ const SearchTab = (props) => {
       </View>
     </View>
   );
+};
+
+const normalize = (text) => {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+};
+
+const titleFilter = (title, data) => {
+  if (!title.trim()) return data;
+
+  const words = title.toLowerCase().split(/\s+/).filter(Boolean).map(normalize);
+
+  return data.filter((item) => {
+    const itemTitle = normalize(item.titulo || "");
+    return words.some((palabra) => itemTitle.includes(palabra));
+  });
 };
 
 const DetailsTab = ({ entry }) => {
@@ -132,7 +143,6 @@ const ResultsSection = ({ rows, entry, action }) => {
         <Text style={styles.col2}>{headers[1]}</Text>
         <Text style={styles.col3}>{headers[2]}</Text>
       </View>
-      {!rows.length && <Text style={styles.centerText}>No hay resultados</Text>}
       {!entry &&
         rows?.map((r, i) => {
           return (
@@ -177,6 +187,8 @@ export const VerDocScreen = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [showPDF, setShowPDF] = useState(false);
+  const [pdfFile, setPdfFile] = useState("");
 
   const [entry, setEntry] = useState(null);
   const [searching, setSearching] = useState(false);
@@ -187,16 +199,18 @@ export const VerDocScreen = () => {
       showMessage("Selecciona una materia");
       return;
     }
-    
-    setSearching(true);
-    try{
-      const newSearchResults = await searchDocuments(subject, category);
 
-      console.log(newSearchResults);
-      
+    setSearching(true);
+    
+    try {
+      let newSearchResults = await searchDocuments(subject, category);
+
+      if(title){
+        newSearchResults = titleFilter(title, newSearchResults);
+      }
+
       setSearchResults(newSearchResults);
-    }
-    catch(error){
+    } catch (error) {
       console.error(error.message);
     }
 
@@ -214,7 +228,7 @@ export const VerDocScreen = () => {
 
       {!viewEntry && (
         <SearchTab
-          subjectList={mockSubjects}
+          subjectList={COLLECTIONS.DOCUMENT_SUBJECTS}
           subject={subject}
           setSubject={setSubject}
           category={category}
@@ -239,7 +253,10 @@ export const VerDocScreen = () => {
         entry={viewEntry}
         action={
           viewEntry
-            ? (row) => {} //Ver un pdf
+            ? (row) => {
+                setPdfFile(row.uri);
+                setShowPDF(true);
+              }
             : (row) => {
                 setEntry(row);
                 setViewEntry(true);
@@ -249,6 +266,11 @@ export const VerDocScreen = () => {
       <Modal isVisible={showModal} closeFn={() => setShowModal(false)}>
         <Text style={styles.centerText}>{modalMessage}</Text>
       </Modal>
+      <ViewPDF
+        isVisible={showPDF}
+        onClose={() => setShowPDF(false)}
+        file={pdfFile}
+      />
     </View>
   );
 };

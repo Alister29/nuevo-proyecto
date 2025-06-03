@@ -38,8 +38,6 @@ const countProgress = (subjects = {}, approved = []) => {
 };
 
 const findPrereq = (materias, code) => {
-  console.log(code);
-  
   for (const nivel of Object.values(materias)) {
     const filter = nivel.filter((m) => m.codigo === code);
     if (filter.length) {
