@@ -2,6 +2,7 @@ export const COLLECTIONS = {
   USERS: "usuarios",
   PENSUM: "pensums",
   EVENTS: "eventos",
+
   SCHEDULES: "horarios",
   DOCUMENTS: "documentos",
   DOCUMENT_SUBJECTS: [
@@ -73,3 +74,4 @@ export const COLLECTIONS = {
   ],
   DOCUMENT_CATEGORIES: ["Apuntes", "Examenes", "Practicas"],
 };
+
