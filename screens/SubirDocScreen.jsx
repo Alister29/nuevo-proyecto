@@ -9,6 +9,7 @@ import { WebView } from 'react-native-webview';
 import { db } from "../database/firebaseConfig";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { format } from 'date-fns'; 
+import { getAuth } from 'firebase/auth';
 
 export const SubirDocScreen = () => {
   const [documentos, setDocumentos] = useState([]);
@@ -26,7 +27,9 @@ export const SubirDocScreen = () => {
   const [errorDocumentos, setErrorDocumentos] = useState(false);
   const botonActivo = documentos.length > 0;
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
-
+  const auth = getAuth();
+  const user = auth.currentUser;
+  
   const agregarDocumento = async () => {
     const result = await DocumentPicker.getDocumentAsync({ type: 'application/pdf' });
     if (result.assets && result.assets.length > 0) {
@@ -64,13 +67,15 @@ export const SubirDocScreen = () => {
       for (const file of documentos) {
         const base64 = await convertirABase64(file.uri);
        await addDoc(collection(db, "documentos_base64"), {
-  titulo,
+   titulo,
   materia,
   categoria,
   nombreArchivo: file.name,
   creadoEn: Timestamp.now(),
   base64Contenido: base64,
-  aprobado: false, // <- campo de aprobación
+  aprobado: false,
+  usuarioId: user?.uid || null,
+  emailUsuario: user?.email || null,
 });
 
       }
@@ -79,6 +84,8 @@ export const SubirDocScreen = () => {
   titulo,
   fecha: new Date().toISOString(),
   estado: 'pendiente',
+  archivo: documentos[0]?.name, // si deseas mostrarlo
+  pesoKB: Math.round(documentos[0]?.size / 1024),
 };
 
       setHistorial([nuevoRegistro, ...historial]);
@@ -216,7 +223,7 @@ export const SubirDocScreen = () => {
       <TouchableOpacity
   style={[
     styles.botonSubir,
-    { backgroundColor: botonActivo ? '#7DDCFF' : '#ccc' }
+    { backgroundColor: botonActivo ? '#007AFF' : '#ccc' }
   ]}
   onPress={() => setMostrarConfirmacion(true)}
   disabled={!botonActivo}
@@ -354,14 +361,14 @@ botonAnadirMini: {
   tableCell: { fontSize: 12 },
   leyenda: { fontSize: 10, marginTop: 4, color: '#555' },
   botonSubir: {
-    backgroundColor: '#49b8ff',
+    backgroundColor: '#007AFF',
     marginTop: 20,
     padding: 12,
     borderRadius: 25,
     alignItems: 'center',
   },
   botonSubirTexto: {
-    color: '#fff',
+    color: 'black',
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -369,6 +376,7 @@ botonAnadirMini: {
     marginTop: 10,
     fontWeight: 'bold',
     textAlign: 'center',
+    
     color: '#007700',
   },
   errorInput: {
@@ -385,7 +393,7 @@ botonAnadirMini: {
   borderColor: '#ccc',
   borderRadius: 4,
   padding: 8,
-  height: 160, // puedes ajustar esto según tu pantalla
+  height: 160,
   backgroundColor: '#fff',
   marginBottom: 8,
 },
@@ -412,13 +420,13 @@ modalBotones: {
   width: '100%',
 },
 botonModalSubir: {
-  backgroundColor: '#7DDCFF',
+  backgroundColor: '#007AFF',
   paddingVertical: 10,
   paddingHorizontal: 30,
   borderRadius: 20,
 },
 textoModalSubir: {
-  color: 'white',
+  color: 'black',
   fontWeight: 'bold',
 },
 botonModalCancelar: {
