@@ -26,11 +26,11 @@ export const DrawerMenuAdmin = () => {
       }}
     >
       <Drawer.Screen name={ROUTES.ADMIN_HOME} component={InicioScreen} />
+      <Drawer.Screen name={ROUTES.ADMIN_SUBIR_MALLA} component={MallaScreen} />
       <Drawer.Screen
         name={ROUTES.ADMIN_SUBIR_HORARIOS}
         component={HorarioScreen}
       />
-      <Drawer.Screen name={ROUTES.ADMIN_SUBIR_MALLA} component={MallaScreen} />
       <Drawer.Screen
         name={ROUTES.ADMIN_SUBIR_EVENTOS}
         component={EventoScreen}
@@ -38,10 +38,6 @@ export const DrawerMenuAdmin = () => {
       <Drawer.Screen
         name={ROUTES.ADMIN_APROBAR_DOCUMENTOS}
         component={DocumentoScreen}
-      />
-      <Drawer.Screen
-        name={ROUTES.ADMIN_ACTUALIZAR_MAPA}
-        component={MapaScreen}
       />
     </Drawer.Navigator>
   );

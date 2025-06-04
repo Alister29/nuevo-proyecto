@@ -61,7 +61,6 @@ export const MallaScreen = () => {
   const subirDatos = async () => {
     const pensum = agruparPorNivel();
     const respuesta = await subirPensum(carrera, pensum);
-    console.log(respuesta);
 
     // Limpiar estado
     setCsvData([]);
