@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, Modal } from 'react-native';
+import {
+  View, Text, TextInput, TouchableOpacity,
+  FlatList, StyleSheet, Alert, Modal, Platform
+} from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { Picker } from '@react-native-picker/picker';
-import * as WebBrowser from 'expo-web-browser';
 import { WebView } from 'react-native-webview';
-import { storage, db } from "../database/firebaseConfig";
-import { ref, uploadBytes } from "firebase/storage";
+import { db } from "../database/firebaseConfig";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { format } from 'date-fns'; 
 
 export const SubirDocScreen = () => {
   const [documentos, setDocumentos] = useState([]);
@@ -15,6 +17,15 @@ export const SubirDocScreen = () => {
   const [titulo, setTitulo] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [previewUri, setPreviewUri] = useState(null);
+  const [subiendo, setSubiendo] = useState(false);
+  const [mensaje, setMensaje] = useState('');
+  const [historial, setHistorial] = useState([]);
+  const [errorMateria, setErrorMateria] = useState(false);
+  const [errorCategoria, setErrorCategoria] = useState(false);
+  const [errorTitulo, setErrorTitulo] = useState(false);
+  const [errorDocumentos, setErrorDocumentos] = useState(false);
+  const botonActivo = documentos.length > 0;
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 
   const agregarDocumento = async () => {
     const result = await DocumentPicker.getDocumentAsync({ type: 'application/pdf' });
@@ -22,44 +33,79 @@ export const SubirDocScreen = () => {
       const file = result.assets[0];
       if (file.size <= 1024 * 1024) {
         setDocumentos([...documentos, file]);
+        setErrorDocumentos(false);
       } else {
-        alert("El archivo excede el límite de 1MB");
+        Alert.alert("Error", "El archivo excede el límite de 1MB.");
       }
     }
   };
 
   const subirDatos = async () => {
-    if (!materia || !categoria || !titulo || documentos.length === 0) {
+    const validMateria = materia !== '';
+    const validCategoria = categoria !== '';
+    const validTitulo = titulo.trim() !== '';
+    const validDocs = documentos.length > 0;
+
+    setErrorMateria(!validMateria);
+    setErrorCategoria(!validCategoria);
+    setErrorTitulo(!validTitulo);
+    setErrorDocumentos(!validDocs);
+    setMensaje("Documentos subidos correctamente. Esperando aprobación del administrador.");
+
+    if (!validMateria || !validCategoria || !validTitulo || !validDocs) {
       Alert.alert("Faltan campos", "Completa todos los campos obligatorios.");
       return;
     }
 
+    setSubiendo(true);
+    setMensaje("Subiendo...");
+
     try {
       for (const file of documentos) {
-        const response = await fetch(file.uri);
-        const blob = await response.blob();
-        const storageRef = ref(storage, `documentos/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, blob);
+        const base64 = await convertirABase64(file.uri);
+       await addDoc(collection(db, "documentos_base64"), {
+  titulo,
+  materia,
+  categoria,
+  nombreArchivo: file.name,
+  creadoEn: Timestamp.now(),
+  base64Contenido: base64,
+  aprobado: false, // <- campo de aprobación
+});
 
-        await addDoc(collection(db, "documentos"), {
-          titulo,
-          materia,
-          categoria,
-          nombreArchivo: file.name,
-          creadoEn: Timestamp.now(),
-          storagePath: storageRef.fullPath,
-        });
       }
 
-      Alert.alert("Éxito", "Documentos subidos correctamente.");
+     const nuevoRegistro = {
+  titulo,
+  fecha: new Date().toISOString(),
+  estado: 'pendiente',
+};
+
+      setHistorial([nuevoRegistro, ...historial]);
+
+      setMensaje("Documentos subidos correctamente.");
       setDocumentos([]);
       setMateria('');
       setCategoria('');
       setTitulo('');
     } catch (error) {
       console.error("Error al subir documentos:", error);
-      Alert.alert("Error", "Ocurrió un error al subir los documentos.");
+      setMensaje("Ocurrió un error al subir los documentos.");
+    } finally {
+      setSubiendo(false);
+      setTimeout(() => setMensaje(''), 5000);
     }
+  };
+
+  const convertirABase64 = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   };
 
   const quitarDocumento = (index) => {
@@ -68,100 +114,191 @@ export const SubirDocScreen = () => {
     setDocumentos(nuevos);
   };
 
-  const verDocumento = (uri) => {
-    setPreviewUri(uri);
+  const verDocumento = async (file) => {
+    const base64 = await convertirABase64(file.uri);
+    setPreviewUri(base64);
     setModalVisible(true);
   };
 
   return (
     <View style={styles.container}>
-      {/* Materia */}
       <Text style={styles.label}>Materia*</Text>
       <View style={styles.pickerContainer}>
-        <Picker selectedValue={materia} onValueChange={(v) => setMateria(v)}>
+        <Picker
+          selectedValue={materia}
+          onValueChange={(value) => {
+            setMateria(value);
+            setErrorMateria(false);
+          }}>
           <Picker.Item label="Selecciona una materia" value="" />
           <Picker.Item label="Álgebra" value="algebra" />
           <Picker.Item label="Cálculo" value="calculo" />
           <Picker.Item label="Física" value="fisica" />
         </Picker>
       </View>
+      {errorMateria && <Text style={styles.errorText}>Este campo es obligatorio.</Text>}
 
-      {/* Categoría */}
       <Text style={styles.label}>Categoría*</Text>
       <View style={styles.pickerContainer}>
-        <Picker selectedValue={categoria} onValueChange={(v) => setCategoria(v)}>
+        <Picker
+          selectedValue={categoria}
+          onValueChange={(value) => {
+            setCategoria(value);
+            setErrorCategoria(false);
+          }}>
           <Picker.Item label="Selecciona una categoría" value="" />
           <Picker.Item label="Apuntes" value="apuntes" />
           <Picker.Item label="Guías" value="guias" />
           <Picker.Item label="Exámenes" value="examenes" />
         </Picker>
       </View>
+      {errorCategoria && <Text style={styles.errorText}>Este campo es obligatorio.</Text>}
 
-      {/* Título */}
       <Text style={styles.label}>Título*</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, errorTitulo && styles.errorInput]}
         placeholder="Ej. Apuntes de Cálculo I"
         value={titulo}
-        onChangeText={setTitulo}
+        onChangeText={(text) => {
+          setTitulo(text);
+          setErrorTitulo(false);
+        }}
       />
+      {errorTitulo && <Text style={styles.errorText}>Este campo es obligatorio.</Text>}
 
-      {/* Documentos */}
-      <Text style={styles.label}>Documentos*</Text>
-      <TouchableOpacity onPress={agregarDocumento} style={styles.botonAnadir}>
-        <Text style={styles.botonAnadirTexto}>+ Añadir documento</Text>
-      </TouchableOpacity>
+      <View style={styles.documentosHeader}>
+  <Text style={styles.label}>Documentos*</Text>
+  <TouchableOpacity onPress={agregarDocumento} style={styles.botonAnadirMini}>
+    <Text style={styles.botonAnadirMiniTexto}>➕ Añadir documento</Text>
+  </TouchableOpacity>
+</View>
 
-      {/* Tabla */}
-      <View style={styles.tableHeader}>
-        <Text style={[styles.tableCell, { flex: 4 }]}>Nombre</Text>
-        <Text style={[styles.tableCell, { flex: 2, textAlign: 'center' }]}>Peso</Text>
-        <Text style={[styles.tableCell, { flex: 2, textAlign: 'center' }]}>Ver</Text>
-        <Text style={[styles.tableCell, { flex: 1, textAlign: 'center' }]}>Quitar</Text>
+
+<View style={styles.contenedorArchivos}>
+  <View style={styles.tableHeader}>
+    <Text style={[styles.tableCell, { flex: 4 }]}>Nombre</Text>
+    <Text style={[styles.tableCell, { flex: 2, textAlign: 'center' }]}>Peso</Text>
+    <Text style={[styles.tableCell, { flex: 2, textAlign: 'center' }]}>Ver</Text>
+    <Text style={[styles.tableCell, { flex: 1, textAlign: 'center' }]}>Quitar</Text>
+  </View>
+
+  {errorDocumentos && (
+    <Text style={styles.errorText}>Debes subir al menos un documento.</Text>
+  )}
+
+  <FlatList
+    data={documentos}
+    keyExtractor={(item, index) => index.toString()}
+    renderItem={({ item, index }) => (
+      <View style={styles.tableRow}>
+        <Text numberOfLines={1} ellipsizeMode="middle" style={[styles.tableCell, { flex: 4 }]}>{item.name}</Text>
+        <Text style={[styles.tableCell, { flex: 2, textAlign: 'center' }]}>{(item.size / 1024).toFixed(0)}kb</Text>
+        <TouchableOpacity onPress={() => verDocumento(item)} style={{ flex: 2, alignItems: 'center' }}>
+          <Text>🔍</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => quitarDocumento(index)} style={{ flex: 1, alignItems: 'center' }}>
+          <Text>❌</Text>
+        </TouchableOpacity>
       </View>
+    )}
+    style={{ flex: 1 }}
+    contentContainerStyle={{ flexGrow: 1 }}
+    showsVerticalScrollIndicator={true}
+  />
+</View>
 
-      <FlatList
-        data={documentos}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.tableRow}>
-            <Text numberOfLines={1} ellipsizeMode="middle" style={[styles.tableCell, { flex: 4 }]}>
-              {item.name}
-            </Text>
-            <Text style={[styles.tableCell, { flex: 2, textAlign: 'center' }]}>
-              {(item.size / 1024).toFixed(0)}kb
-            </Text>
-            <TouchableOpacity onPress={() => verDocumento(item.uri)} style={[styles.tableCell, { flex: 2, alignItems: 'center' }]}>
-              <Text>🔍</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => quitarDocumento(index)} style={{ flex: 1, alignItems: 'center' }}>
-              <Text>❌</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
 
-      {/* Leyendas */}
+
       <Text style={styles.leyenda}>* Campos obligatorios</Text>
       <Text style={styles.leyenda}>* Límite por archivo 1MB</Text>
       <Text style={styles.leyenda}>* Los archivos deberán aprobarse para aparecer públicamente</Text>
 
-      {/* Botón Subir */}
-      <TouchableOpacity style={styles.botonSubir} onPress={subirDatos}>
-        <Text style={styles.botonSubirTexto}>Subir</Text>
-      </TouchableOpacity>
+      <TouchableOpacity
+  style={[
+    styles.botonSubir,
+    { backgroundColor: botonActivo ? '#7DDCFF' : '#ccc' }
+  ]}
+  onPress={() => setMostrarConfirmacion(true)}
+  disabled={!botonActivo}
+>
+  <Text style={styles.botonSubirTexto}>Subir</Text>
+</TouchableOpacity>
 
-      {/* Modal de vista previa */}
+      {mensaje !== '' && <Text style={styles.mensaje}>{mensaje}</Text>}
+
+      {historial.length > 0 && (
+        <View style={{ marginTop: 20 }}>
+          <Text style={styles.label}>Historial de documentos subidos:</Text>
+          {historial.map((item, index) => (
+            <View key={index} style={{ marginTop: 4 }}>
+             <Text style={{ fontSize: 12 }}>
+            📄 {item.titulo} - {format(new Date(item.fecha), 'dd/MM/yyyy HH:mm')} ({item.estado || 'pendiente'})
+            </Text>
+
+            </View>
+          ))}
+        </View>
+      )}
+
       <Modal visible={modalVisible} animationType="slide">
         <View style={{ flex: 1 }}>
-          <TouchableOpacity onPress={() => setModalVisible(false)} style={{ padding: 10, alignSelf: 'flex-end' }}>
-            <Text style={{ fontSize: 18 }}>❌</Text>
+          <TouchableOpacity onPress={() => setModalVisible(false)} style={{ padding: 10, backgroundColor: '#ccc' }}>
+            <Text style={{ textAlign: 'center' }}>Cerrar vista previa</Text>
           </TouchableOpacity>
+
           {previewUri && (
-            <WebView source={{ uri: previewUri }} style={{ flex: 1 }} />
+            Platform.OS === 'web' ? (
+              <iframe
+                src={previewUri}
+                style={{ flex: 1, width: '100%', height: '100%' }}
+                title="Vista previa del documento"
+              />
+            ) : (
+              <WebView
+                source={{ uri: previewUri }}
+                style={{ flex: 1 }}
+                useWebKit
+                originWhitelist={['*']}
+                allowFileAccess
+                startInLoadingState
+              />
+              
+            )
           )}
         </View>
       </Modal>
+      <Modal
+  visible={mostrarConfirmacion}
+  transparent
+  animationType="slide"
+  onRequestClose={() => setMostrarConfirmacion(false)}
+>
+  <View style={styles.modalFondo}>
+    <View style={styles.modalContenido}>
+      <Text style={styles.modalTexto}>
+        ¿Subir {titulo || 'los documentos'}?
+      </Text>
+      <View style={styles.modalBotones}>
+        <TouchableOpacity
+          style={styles.botonModalSubir}
+          onPress={() => {
+            setMostrarConfirmacion(false);
+            subirDatos();
+          }}
+        >
+          <Text style={styles.textoModalSubir}>Subir</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.botonModalCancelar}
+          onPress={() => setMostrarConfirmacion(false)}
+        >
+          <Text style={styles.textoModalCancelar}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
     </View>
   );
 };
@@ -180,13 +317,27 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 10,
   },
-  botonAnadir: {
-    backgroundColor: '#eee',
-    padding: 10,
-    alignItems: 'center',
-    marginBottom: 10,
-    borderRadius: 4,
-  },
+  documentosHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 10,
+  marginBottom: 8,
+},
+
+botonAnadirMini: {
+  backgroundColor: '#fff',
+  paddingVertical: 4,
+  paddingHorizontal: 10,
+  borderRadius: 10,
+  borderWidth: 1,
+  borderColor: '#ccc',
+  elevation: 2,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.2,
+  shadowRadius: 1,
+},
   botonAnadirTexto: { fontWeight: 'bold' },
   tableHeader: {
     flexDirection: 'row',
@@ -206,11 +357,79 @@ const styles = StyleSheet.create({
     backgroundColor: '#49b8ff',
     marginTop: 20,
     padding: 12,
-    borderRadius: 5,
+    borderRadius: 25,
     alignItems: 'center',
   },
   botonSubirTexto: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
+  mensaje: {
+    marginTop: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#007700',
+  },
+  errorInput: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 10,
+    marginBottom: 4,
+  },
+  contenedorArchivos: {
+  borderWidth: 1,
+  borderColor: '#ccc',
+  borderRadius: 4,
+  padding: 8,
+  height: 160, // puedes ajustar esto según tu pantalla
+  backgroundColor: '#fff',
+  marginBottom: 8,
+},
+modalFondo: {
+  flex: 1,
+  justifyContent: 'flex-end',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+},
+modalContenido: {
+  backgroundColor: 'white',
+  padding: 20,
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  alignItems: 'center',
+},
+modalTexto: {
+  fontSize: 16,
+  marginBottom: 20,
+  textAlign: 'center',
+},
+modalBotones: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+},
+botonModalSubir: {
+  backgroundColor: '#7DDCFF',
+  paddingVertical: 10,
+  paddingHorizontal: 30,
+  borderRadius: 20,
+},
+textoModalSubir: {
+  color: 'white',
+  fontWeight: 'bold',
+},
+botonModalCancelar: {
+  backgroundColor: '#ccc',
+  paddingVertical: 10,
+  paddingHorizontal: 30,
+  borderRadius: 20,
+},
+textoModalCancelar: {
+  color: 'black',
+  fontWeight: 'bold',
+},
+
 });
