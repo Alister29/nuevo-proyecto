@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  FlatList, StyleSheet, Alert, Modal, Platform, ScrollView
+  FlatList, StyleSheet, Alert, ScrollView
 } from 'react-native';
+import {  Modal,ViewPDF } from '../components'; 
 import * as DocumentPicker from 'expo-document-picker';
 import { Picker } from '@react-native-picker/picker';
-import { WebView } from 'react-native-webview';
 import { db } from "../database/firebaseConfig";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { format } from 'date-fns'; 
 import { getAuth } from 'firebase/auth';
 import { COLLECTIONS } from "../database";
 
-export const SubirDocScreen = () => {
+export const SubirDocScreen = () => {3
   const [documentos, setDocumentos] = useState([]);
   const [materia, setMateria] = useState('');
   const [categoria, setCategoria] = useState('');
   const [titulo, setTitulo] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [previewUri, setPreviewUri] = useState(null);
   const [subiendo, setSubiendo] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [historial, setHistorial] = useState([]);
@@ -27,6 +25,9 @@ export const SubirDocScreen = () => {
   const [errorTitulo, setErrorTitulo] = useState(false);
   const [errorDocumentos, setErrorDocumentos] = useState(false);
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+  const [pdfVisible, setPdfVisible] = useState(false);
+  const [selectedUri, setSelectedUri] = useState(null);
+
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -89,7 +90,6 @@ export const SubirDocScreen = () => {
       };
 
       setHistorial([nuevoRegistro, ...historial]);
-
       setMensaje("Documentos subidos correctamente. Esperando aprobación del administrador.");
       setDocumentos([]);
       setMateria('');
@@ -123,8 +123,8 @@ export const SubirDocScreen = () => {
 
   const verDocumento = async (file) => {
     const base64 = await convertirABase64(file.uri);
-    setPreviewUri(base64);
-    setModalVisible(true);
+    setSelectedUri(base64);
+    setPdfVisible(true);
   };
 
   return (
@@ -209,8 +209,6 @@ export const SubirDocScreen = () => {
               </TouchableOpacity>
             </View>
           )}
-          style={{ flex: 1 }}
-          contentContainerStyle={{ flexGrow: 1 }}
         />
       </View>
 
@@ -239,57 +237,42 @@ export const SubirDocScreen = () => {
         </View>
       )}
 
-      <Modal visible={modalVisible} animationType="slide">
-        <View style={{ flex: 1 }}>
-          <TouchableOpacity onPress={() => setModalVisible(false)} style={{ padding: 10, backgroundColor: '#ccc' }}>
-            <Text style={{ textAlign: 'center' }}>Cerrar vista previa</Text>
-          </TouchableOpacity>
-          {previewUri && (
-            Platform.OS === 'web' ? (
-              <iframe src={previewUri} style={{ flex: 1, width: '100%', height: '100%' }} title="Vista previa del documento" />
-            ) : (
-              <WebView source={{ uri: previewUri }} style={{ flex: 1 }} useWebKit originWhitelist={['*']} allowFileAccess startInLoadingState />
-            )
-          )}
-        </View>
-      </Modal>
+      <ViewPDF
+        isVisible={pdfVisible}
+        file={selectedUri}
+        onClose={() => setPdfVisible(false)}
+      />
 
-      <Modal
-        visible={mostrarConfirmacion}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setMostrarConfirmacion(false)}
-      >
-        <View style={styles.modalFondo}>
-          <View style={styles.modalContenido}>
-            <Text style={styles.modalTexto}>
-              ¿Subir {titulo || 'los documentos'}?
-            </Text>
-            <View style={styles.modalBotones}>
-              <TouchableOpacity
-                style={styles.botonModalSubir}
-                onPress={() => {
-                  setMostrarConfirmacion(false);
-                  subirDatos();
-                }}
-              >
-                <Text style={styles.textoModalSubir}>Subir</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.botonModalCancelar}
-                onPress={() => setMostrarConfirmacion(false)}
-              >
-                <Text style={styles.textoModalCancelar}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <Modal isVisible={mostrarConfirmacion} closeFn={() => setMostrarConfirmacion(false)}>
+  <Text style={styles.modalTexto}>
+    ¿Subir {titulo || 'los documentos'}?
+  </Text>
+  <View style={styles.modalBotones}>
+    <TouchableOpacity
+      style={styles.botonModalSubir}
+      onPress={() => {
+        setMostrarConfirmacion(false);
+        subirDatos();
+      }}
+    >
+      <Text style={styles.textoModalSubir}>Subir</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.botonModalCancelar}
+      onPress={() => setMostrarConfirmacion(false)}
+    >
+      <Text style={styles.textoModalCancelar}>Cancelar</Text>
+    </TouchableOpacity>
+  </View>
+</Modal>
+
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  
+
   container: { padding: 16 },
   label: { fontWeight: 'bold', marginTop: 10 },
   input: {
