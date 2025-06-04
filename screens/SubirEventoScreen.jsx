@@ -96,3 +96,4 @@ const styles = StyleSheet.create({
   input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10 },
   imagen: { width: '100%', height: 200, marginTop: 10, marginBottom: 10 },
 });
+
