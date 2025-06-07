@@ -18,7 +18,13 @@ const getColorForSubject = (subject) => {
   const colors = ["#FFCDD2", "#C8E6C9", "#BBDEFB", "#FFECB3", "#E1BEE7", "#D1C4E9", "#B2EBF2"];
   return colors[subject.charCodeAt(0) % colors.length];
 };
-
+const guardarHorario = () => {
+  if (choquesMaterias.length > 0) {
+    Alert.alert("Error", "No puedes guardar el horario mientras haya choques.");
+    return;
+  }
+  guardarHorarioEnFirebase(materiasAsignadas);
+};
 export const HorarioScreen = () => {
   const [materiasAsignadas, setMateriasAsignadas] = useState([]);
   const [modalMateriasVisible, setModalMateriasVisible] = useState(false);
@@ -26,6 +32,8 @@ export const HorarioScreen = () => {
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [docenteSeleccionado, setDocenteSeleccionado] = useState({});
   const [materiaSeleccionada, setMateriaSeleccionada] = useState(null);
+  const [choquesMaterias, setChoquesMaterias] = useState([]);
+  const [docentesConChoque, setDocentesConChoque] = useState([]);
 
   useEffect(() => {
     cargarHorarioDesdeFirebase((materiasCargadas) => {
@@ -38,7 +46,23 @@ export const HorarioScreen = () => {
       );
     });
   }, []);
+
+  useEffect(() => {
+    // Identificar materias en conflicto
+    const materiasConChoque = materiasAsignadas
+      .filter(materia => materiasAsignadas.filter(m => m.dia === materia.dia && m.hora === materia.hora).length > 1)
+      .map(m => m.nombre);
   
+    setChoquesMaterias(materiasConChoque);
+  
+    // Identificar docentes en conflicto
+    const docentesConChoqueDetectados = materiasAsignadas
+      .filter(materia => materiasConChoque.includes(materia.nombre))
+      .map(m => `${m.nombre}-${m.grupo}`);
+  
+    setDocentesConChoque(docentesConChoqueDetectados);
+  }, [materiasAsignadas]);
+
   const seleccionarMateria = (materia) => {
     setSelectedSubject(selectedSubject === materia ? null : materia);
   };
@@ -138,8 +162,8 @@ export const HorarioScreen = () => {
         </ScrollView>
       </ScrollView>
 
-      <Button title="Ver Materias" onPress={() => setModalMateriasVisible(true)} />
-      <Button title="Guardar horario" onPress={() => guardarHorarioEnFirebase(materiasAsignadas)} />
+      <Button title="Ver Materias" onPress={() => setModalMateriasVisible(true)} color={choquesMaterias.length > 0 ? "red" : "blue"}/>
+      <Button title="Guardar horario" onPress={guardarHorario} color={choquesMaterias.length > 0 ? "red" : "blue"} />
 
       {/* Modal para seleccionar materias por nivel */}
       <Modal visible={modalMateriasVisible} animationType="slide">
@@ -157,17 +181,20 @@ export const HorarioScreen = () => {
                     {scheduleData[level]?.map((subject, index) => (
                       <View key={index} style={styles.materiaContainer}>
                         <TouchableOpacity onPress={() => seleccionarMateria(subject)}>
-                          <Text style={[styles.materiaTitulo, selectedSubject === subject && styles.materiaSeleccionada]}>
+                          <Text style={[styles.materiaTitulo, selectedSubject === subject && styles.materiaSeleccionada, choquesMaterias.includes(subject.nombre) && styles.elementoRojo]}>
                             {subject.nombre}
                           </Text>
                         </TouchableOpacity>
 
                         {/* Si la materia está expandida, mostrar los docentes debajo */}
-                        {selectedSubject === subject && subject.docentes.map((docente, i) => (
-                          <TouchableOpacity key={i} onPress={() => seleccionarDocente(subject, docente)} style={styles.docenteItem}>
+                        {selectedSubject === subject && subject.docentes.map((docente, i) => {
+                          const docenteKey = `${subject.nombre}-${docente.grupo}`;
+                          return (
+                          <TouchableOpacity key={i} onPress={() => seleccionarDocente(subject, docente)} style={[styles.docenteItem, docentesConChoque.includes(docenteKey) && styles.elementoRojo]}>
                             <Text>{docente.grupo} {docente.nombre}</Text>
                           </TouchableOpacity>
-                        ))}
+                          );
+                        })}
                       </View>
                     ))}
                   </View>
@@ -185,6 +212,7 @@ export const HorarioScreen = () => {
 
 // Estilos
 const styles = StyleSheet.create({
+  elementoRojo: { backgroundColor: "red", color: "white",},
   scheduleContainer: { backgroundColor: "#E0F7FA" },
   headerRow: { flexDirection: "row", backgroundColor: "#B2EBF2" },
   headerCell: { width: 120, borderWidth: 1, alignItems: "center", justifyContent: "center", padding: 5 },
