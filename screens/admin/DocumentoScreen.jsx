@@ -17,7 +17,7 @@ export const DocumentoScreen = () => {
     const querySnapshot = await getDocs(collection(db, "documentos"));
     const data = querySnapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(doc => doc.aprobado === null);
+      .filter(doc => doc.aprobado === null|| doc.aprobado === undefined);
     setDocumentos(data);
   };
 
@@ -78,13 +78,19 @@ export const DocumentoScreen = () => {
         <Text style={styles.resultsLabel}>Archivos</Text>
         <View style={[styles.resultsContainer, { height: heightStyle }]}>
           <View style={styles.row}><Text style={styles.col1}>Archivo</Text><Text style={styles.col2}>Peso</Text><Text style={styles.col3}>Ver</Text></View>
-          {selected.archivos.map((file, index) => (
-            <TouchableOpacity style={styles.row} key={`result-files${index}`}>
-              <Text style={styles.col1}>{file.nombre}</Text>
-              <Text style={styles.col2}>{file.peso}</Text>
-              <Text style={styles.col3}>🔍</Text>
-            </TouchableOpacity>
-          ))}
+          {selected.archivos && selected.archivos.length > 0 ? (
+  selected.archivos.map((file, index) => (
+    <TouchableOpacity style={styles.row} key={`result-files${index}`}>
+      <Text style={styles.col1}>{file.nombre}</Text>
+      <Text style={styles.col2}>{file.peso}</Text>
+      <Text style={styles.col3}>🔍</Text>
+    </TouchableOpacity>
+  ))
+) : (
+  <Text>No hay archivos para mostrar.</Text>
+)}
+
+
         </View>
         
         <TouchableOpacity style={styles.btnAzul} onPress={() => setModalAprobarVisible(true)}>

@@ -3,16 +3,16 @@ import {
   View, Text, TextInput, TouchableOpacity,
   FlatList, StyleSheet, Alert, ScrollView
 } from 'react-native';
-import {  Modal,ViewPDF } from '../components'; 
+import { Modal, ViewPDF } from '../components';
 import * as DocumentPicker from 'expo-document-picker';
 import { Picker } from '@react-native-picker/picker';
 import { db } from "../database/firebaseConfig";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { format } from 'date-fns'; 
+import { format } from 'date-fns';
 import { getAuth } from 'firebase/auth';
 import { COLLECTIONS } from "../database";
 
-export const SubirDocScreen = () => {3
+export const SubirDocScreen = () => {
   const [documentos, setDocumentos] = useState([]);
   const [materia, setMateria] = useState('');
   const [categoria, setCategoria] = useState('');
@@ -46,6 +46,17 @@ export const SubirDocScreen = () => {3
     }
   };
 
+  const convertirABase64 = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result); // incluye 'data:application/pdf;base64,...'
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
   const subirDatos = async () => {
     const validMateria = materia !== '';
     const validCategoria = categoria !== '';
@@ -56,7 +67,8 @@ export const SubirDocScreen = () => {3
     setErrorCategoria(!validCategoria);
     setErrorTitulo(!validTitulo);
     setErrorDocumentos(!validDocs);
-
+    setSubiendo(true);
+    setMensaje("Subiendo...");
     if (!validMateria || !validCategoria || !validTitulo || !validDocs) {
       Alert.alert("Faltan campos", "Completa todos los campos obligatorios.");
       return;
@@ -66,54 +78,49 @@ export const SubirDocScreen = () => {3
     setMensaje("Subiendo...");
 
     try {
-      for (const file of documentos) {
-        const base64 = await convertirABase64(file.uri);
-        await addDoc(collection(db, "documentos_base64"), {
-          titulo,
-          materia,
-          categoria,
-          nombreArchivo: file.name,
-          creadoEn: Timestamp.now(),
-          base64Contenido: base64,
-          aprobado: false,
-          usuarioId: user?.uid || null,
-          emailUsuario: user?.email || null,
-        });
-      }
+    // Convertimos todos los archivos a base64 y armamos el array de archivos
+    const archivosBase64 = [];
+    for (const file of documentos) {
+      const base64ConPrefix = await convertirABase64(file.uri);
+      archivosBase64.push({
+        nombre: file.name,
+        tipoMime: 'application/pdf',
+        base64Contenido: base64ConPrefix,
+      });
+    }
+ await addDoc(collection(db, "documentos"), {
+      titulo,
+      materia,
+      categoria,
+      creadoEn: Timestamp.now(),
+      aprobado: null,
+      usuarioId: user?.uid,
+      archivos: archivosBase64,  // <-- aquí todos los archivos juntos
+    });
 
       const nuevoRegistro = {
-        titulo,
-        fecha: new Date().toISOString(),
-        estado: 'pendiente',
-        archivo: documentos[0]?.name,
-        pesoKB: Math.round(documentos[0]?.size / 1024),
-      };
+      titulo,
+      fecha: new Date().toISOString(),
+      estado: 'pendiente',
+      archivo: documentos[0]?.name,
+      pesoKB: Math.round(documentos[0]?.size / 1024),
+    };
+    setHistorial([nuevoRegistro, ...historial]);
 
-      setHistorial([nuevoRegistro, ...historial]);
-      setMensaje("Documentos subidos correctamente. Esperando aprobación del administrador.");
-      setDocumentos([]);
-      setMateria('');
-      setCategoria('');
-      setTitulo('');
-    } catch (error) {
-      console.error("Error al subir documentos:", error);
-      setMensaje("Ocurrió un error al subir los documentos.");
-    } finally {
-      setSubiendo(false);
-      setTimeout(() => setMensaje(''), 5000);
-    }
-  };
+    setMensaje("Documentos subidos correctamente. Esperando aprobación del administrador.");
+    setDocumentos([]);
+    setMateria('');
+    setCategoria('');
+    setTitulo('');
+  } catch (error) {
+    console.error("Error al subir documentos:", error);
+    setMensaje("Ocurrió un error al subir los documentos.");
+  } finally {
+    setSubiendo(false);
+    setTimeout(() => setMensaje(''), 5000);
+  }
+};
 
-  const convertirABase64 = async (uri) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  };
 
   const quitarDocumento = (index) => {
     const nuevos = [...documentos];
@@ -231,7 +238,7 @@ export const SubirDocScreen = () => {3
           <Text style={styles.label}>Historial de documentos subidos:</Text>
           {historial.map((item, index) => (
             <Text key={index} style={{ fontSize: 12 }}>
-              📄 {item.titulo} - {format(new Date(item.fecha), 'dd/MM/yyyy HH:mm')} ({item.estado || 'pendiente'})
+              📄 {item.titulo} - {format(new Date(item.fecha), 'dd/MM/yyyy HH:mm')} ({item.estado})
             </Text>
           ))}
         </View>
@@ -244,28 +251,25 @@ export const SubirDocScreen = () => {3
       />
 
       <Modal isVisible={mostrarConfirmacion} closeFn={() => setMostrarConfirmacion(false)}>
-  <Text style={styles.modalTexto}>
-    ¿Subir {titulo || 'los documentos'}?
-  </Text>
-  <View style={styles.modalBotones}>
-    <TouchableOpacity
-      style={styles.botonModalSubir}
-      onPress={() => {
-        setMostrarConfirmacion(false);
-        subirDatos();
-      }}
-    >
-      <Text style={styles.textoModalSubir}>Subir</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      style={styles.botonModalCancelar}
-      onPress={() => setMostrarConfirmacion(false)}
-    >
-      <Text style={styles.textoModalCancelar}>Cancelar</Text>
-    </TouchableOpacity>
-  </View>
-</Modal>
-
+        <Text style={styles.modalTexto}>¿Subir {titulo || 'los documentos'}?</Text>
+        <View style={styles.modalBotones}>
+          <TouchableOpacity
+            style={styles.botonModalSubir}
+            onPress={() => {
+              setMostrarConfirmacion(false);
+              subirDatos();
+            }}
+          >
+            <Text style={styles.textoModalSubir}>Subir</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.botonModalCancelar}
+            onPress={() => setMostrarConfirmacion(false)}
+          >
+            <Text style={styles.textoModalCancelar}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
