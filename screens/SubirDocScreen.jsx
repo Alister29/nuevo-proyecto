@@ -58,27 +58,27 @@ export const SubirDocScreen = () => {
   };
 
   const subirDatos = async () => {
-    const validMateria = materia !== '';
-    const validCategoria = categoria !== '';
-    const validTitulo = titulo.trim() !== '';
-    const validDocs = documentos.length > 0;
+  const validMateria = materia !== '';
+  const validCategoria = categoria !== '';
+  const validTitulo = titulo.trim() !== '';
+  const validDocs = documentos.length > 0;
 
-    setErrorMateria(!validMateria);
-    setErrorCategoria(!validCategoria);
-    setErrorTitulo(!validTitulo);
-    setErrorDocumentos(!validDocs);
-    setSubiendo(true);
-    setMensaje("Subiendo...");
-    if (!validMateria || !validCategoria || !validTitulo || !validDocs) {
-      Alert.alert("Faltan campos", "Completa todos los campos obligatorios.");
-      return;
-    }
+  setErrorMateria(!validMateria);
+  setErrorCategoria(!validCategoria);
+  setErrorTitulo(!validTitulo);
+  setErrorDocumentos(!validDocs);
 
-    setSubiendo(true);
-    setMensaje("Subiendo...");
+  if (!validMateria || !validCategoria || !validTitulo || !validDocs) {
+    setMensaje("Completa todos los campos obligatorios.");
+    setSubiendo(false);
+    return;
+  }
 
-    try {
-    // Convertimos todos los archivos a base64 y armamos el array de archivos
+  setSubiendo(true);
+  setMensaje("Subiendo...");
+
+  try {
+    // Convertir documentos a base64
     const archivosBase64 = [];
     for (const file of documentos) {
       const base64ConPrefix = await convertirABase64(file.uri);
@@ -88,25 +88,30 @@ export const SubirDocScreen = () => {
         base64Contenido: base64ConPrefix,
       });
     }
- await addDoc(collection(db, "documentos"), {
+
+    // Subir a Firestore
+    await addDoc(collection(db, "documentos"), {
       titulo,
       materia,
       categoria,
       creadoEn: Timestamp.now(),
       aprobado: null,
       usuarioId: user?.uid,
-      archivos: archivosBase64,  // <-- aquí todos los archivos juntos
+      archivos: archivosBase64,
     });
 
-      const nuevoRegistro = {
+    // Agregar al historial local (solo el primero)
+    const nuevoRegistro = {
       titulo,
       fecha: new Date().toISOString(),
       estado: 'pendiente',
-      archivo: documentos[0]?.name,
-      pesoKB: Math.round(documentos[0]?.size / 1024),
+      archivo: documentos[0].name,
+      pesoKB: Math.round(documentos[0].size / 1024),
     };
+
     setHistorial([nuevoRegistro, ...historial]);
 
+    // Limpiar formulario
     setMensaje("Documentos subidos correctamente. Esperando aprobación del administrador.");
     setDocumentos([]);
     setMateria('');
