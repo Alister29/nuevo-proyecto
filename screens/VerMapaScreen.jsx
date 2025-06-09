@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Dimensions, TextInput, FlatList, ScrollView, Modal, Image } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
+import { useEffect } from "react";
 
 const { width, height } = Dimensions.get("window");
 const puntos = [
@@ -54,14 +55,19 @@ const puntos = [
   { id: 48, nombre: "Canchas polifuncionales", x: 678, y: 250, descripcion: "", imagen: require("../assets/48.jpeg") },
   { id: 49, nombre: "Aulas 660 y 661", x: 247, y: 337, descripcion: "", imagen: require("../assets/49.jpeg") },
 ];
-export const VerMapaScreen = () => {
-  const [info, setInfo] = useState(null);
+const VerMapaScreen = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [puntoSeleccionado, setPuntoSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);
   const scrollRefX = useRef(null); // Referencia para ScrollView horizontal
   const scrollRefY = useRef(null); // Referencia para ScrollView vertical
   const zoom = useSharedValue(1); // Estado para zoom
   
+  useEffect(() => {
+    // Resetea el estado cuando se monta la pantalla
+    setPuntoSeleccionado(null);
+  }, []);
   // Estilo animado para zoom
   const animatedStyles = useAnimatedStyle(() => ({
     transform: [{ scale: zoom.value }],
@@ -185,3 +191,5 @@ const styles = StyleSheet.create({
   modalDescription: { marginTop: 10 },
   modalClose: { marginTop: 20, alignSelf: "center", padding: 10, backgroundColor: "#ddd", borderRadius: 5 },
 });
+
+export default VerMapaScreen;
