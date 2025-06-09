@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Dimensions, TextInput, FlatList, ScrollView, Modal, Image } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
+import { useEffect } from "react";
 
 const { width, height } = Dimensions.get("window");
 const puntos = [
@@ -62,6 +63,11 @@ const VerMapaScreen = () => {
   const scrollRefX = useRef(null); // Referencia para ScrollView horizontal
   const scrollRefY = useRef(null); // Referencia para ScrollView vertical
   const zoom = useSharedValue(1); // Estado para zoom
+
+  useEffect(() => {
+    // Resetea el estado cuando se monta la pantalla
+    setPuntoSeleccionado(null);
+  }, []);
   
   // Estilo animado para zoom
   const animatedStyles = useAnimatedStyle(() => ({
