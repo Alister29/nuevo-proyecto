@@ -1,5 +1,5 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "../database"; 
+import { auth, db, COLLECTIONS } from "../database";
 
 /**
  * Obtiene el horario guardado del usuario en Firebase.
@@ -45,3 +45,11 @@ async function guardarHorarioEnFirebase(materiasAsignadas) {
   }
 }
 export { guardarHorarioEnFirebase, cargarHorarioDesdeFirebase };
+
+export const uploadCareerSchedules = async (carrera, horarios) => {
+  try {
+    await setDoc(doc(db, COLLECTIONS.CAREER_SCHEDULES, carrera), horarios);
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
