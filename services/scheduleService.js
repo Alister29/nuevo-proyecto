@@ -1,17 +1,20 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db, COLLECTIONS } from "../database";
+import { auth, db } from "../database/firebaseConfig";
+import { COLLECTIONS } from "../database/collections";
+import { useAuth } from "../context/AuthContext";
 
 /**
  * Obtiene el horario guardado del usuario en Firebase.
  */
 async function cargarHorarioDesdeFirebase(setMateriasAsignadas) {
-  const user = auth.currentUser;
+  const { user } = useAuth(); // Obtener usuario desde el contexto
+
   if (!user) {
     console.error("❌ Usuario no autenticado.");
     return;
   }
 
-  const userId = user.uid; // Obtiene el ID del usuario autenticado
+  const userId = user.uid; // Obtener el ID del usuario
 
   try {
     const docSnap = await getDoc(doc(db, "horarios", userId));
@@ -27,19 +30,20 @@ async function cargarHorarioDesdeFirebase(setMateriasAsignadas) {
  * Guarda el horario seleccionado del usuario autenticado en Firestore.
  */
 async function guardarHorarioEnFirebase(materiasAsignadas) {
-  const user = auth.currentUser;
+  const { user } = useAuth(); // Obtener usuario desde el contexto
+
   if (!user) {
     console.error("❌ Usuario no autenticado.");
     return;
   }
 
-  const userId = user.uid; // Obtiene el ID del usuario autenticado
+  const userId = user.uid; // Obtener el ID del usuario
 
   try {
     await setDoc(doc(db, "horarios", userId), {
       horario: materiasAsignadas,
     });
-    console.log("Horario guardado correctamente.");
+    console.log("✅ Horario guardado correctamente.");
   } catch (error) {
     console.error("Error al guardar el horario:", error);
   }

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   ScrollView,
@@ -6,10 +6,13 @@ import {
   StyleSheet,
   Button,
   Dimensions,
+  Alert,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { TarjetaMateria, BarraProgreso, Modal } from "../components";
 import * as pensumSrv from "../services/pensumService";
+import { useAuth } from "../context";
 
 const { width, height } = Dimensions.get("window");
 
@@ -61,17 +64,43 @@ export const ProgresoScreen = () => {
   });
   const [editando, setEditando] = useState(false);
 
-  const cargarMaterias = () => {
-    pensumSrv.leerPensum("Ing. Sistemas").then((data) => {
-      const keys = Object.keys(data).sort();
-      const newMaterias = {};
-      keys.forEach(k => newMaterias[k] = data[k]);
-      setMaterias(newMaterias);
-      setProgreso(countProgress(newMaterias, aprobadas));
+  const { user } = useAuth();
+
+  const recuperarDatos = async () => {
+    const pensumMaterias = await pensumSrv.leerPensum("Ing. Sistemas");
+    const keys = Object.keys(pensumMaterias).sort();
+    const newMaterias = {};
+    keys.forEach((k) => (newMaterias[k] = pensumMaterias[k]));
+    setMaterias(newMaterias);
+
+    const newAprobadas = await pensumSrv.loadProgress(user);
+    setAprobadas(newAprobadas);
+
+    const newProgress = countProgress(newMaterias, newAprobadas);
+    setProgreso(newProgress);
+  }
+
+  const limpiarDatos = () => {
+    setAprobadas([]);
+    setMaterias({});
+    setProgreso({
+      total: 0,
+      normales: 0,
+      normAprobadas: 0,
+      electivas: 0,
+      electAprobadas: 0,
     });
   };
 
-  useEffect(cargarMaterias, []);
+  useFocusEffect(
+    useCallback(() => {
+      limpiarDatos();
+      recuperarDatos();
+
+      return () => {
+      };
+    }, [user])
+  );
 
   const toggleInfo = (materia) => {
     setInfo(materia);
@@ -84,8 +113,10 @@ export const ProgresoScreen = () => {
       : setAprobadas([...aprobadas, codigo]);
   };
 
-  const guardarCambios = () => {
+  const guardarCambios = async () => {
     setProgreso(countProgress(materias, aprobadas));
+    const result = await pensumSrv.saveProgress(user, aprobadas);
+    Alert.alert(result);
   };
 
   return (
@@ -103,18 +134,16 @@ export const ProgresoScreen = () => {
         <Text>Tipo: {info.tipo}</Text>
         <Text>Electiva: {info.electiva}</Text>
         <Text>Pre-Requisitos: {info.prereq?.replace('"', "")}</Text>
-        {info.prereq
-          ?.split(" ")
-          .map((p, i) => {
-            return (
-              <Text
-                style={styles.prereq}
-                key={`${info.materia}-${info.electiva}-${i}`}
-              >
-                {findPrereq(materias, p.trim())}
-              </Text>
-            );
-          })}
+        {info.prereq?.split(" ").map((p, i) => {
+          return (
+            <Text
+              style={styles.prereq}
+              key={`${info.materia}-${info.electiva}-${i}`}
+            >
+              {findPrereq(materias, p.trim())}
+            </Text>
+          );
+        })}
       </Modal>
 
       <Text style={styles.career}>Carrera: {"Ing. de Sistemas"}</Text>

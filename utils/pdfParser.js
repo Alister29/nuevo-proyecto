@@ -49,7 +49,9 @@ const newEntry = (entry, type) => {
 };
 
 const addEntry = (entries, t1, t2, t3) => {
-  const entry = {
+  console.log("add entry", t1, t2);
+
+  /* const entry = {
     nivel: t1[0],
     id_mat: t1[1],
     nombre_mat: t1[2],
@@ -62,6 +64,21 @@ const addEntry = (entries, t1, t2, t3) => {
       .padStart(9, "0")
       .replace(/(\d{2})(\d{2})-(\d{2})(\d{2})/, "$1:$2-$3:$4"),
     aula: t3[2],
+  }; */
+
+  const entry = {
+    nivel: t1[0],
+    id_mat: t1[1],
+    nombre_mat: t1[2],
+    grupo: "G: " + t2[0],
+    tipo: t2[1] || "",
+    docente: t2[2] || "POR DESIGNAR DOCENTE",
+    dia: castDay(t2[3]),
+    hora: t2[4]
+      .replace(" ", "")
+      .padStart(9, "0")
+      .replace(/(\d{2})(\d{2})-(\d{2})(\d{2})/, "$1:$2-$3:$4"),
+    aula: t2[5],
   };
 
   if (entries.hasOwnProperty(entry.nivel)) {
@@ -98,11 +115,21 @@ export const readLines = async (file_buffer) => {
   return lines.map((line) => line.trim()).filter((line) => line !== "");
 }; */
 
-export const parse = async (lines) => {
-  const regexMateria = /^([A-Z])(\d+)\s+(.*)$/;
+export const parse = (textArray) => {
+  console.log(textArray);
+
+  const lines = textArray
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
+
+  const regexMateria = /^([A-Z])\s+(\d+)\s+(.*)$/;
   const regexGrupoDocente = /^(\d+|[A-Z]\d*)\s*(\[[A-Z]+\])?\s*(.*)$/;
   const regexNameOnly = /^([A-Z]+)$/;
-  const regexDiaHoraAula = /^([A-Z]{2})(\d{3,4}\s?\-\d{4})(.*)$/;
+  const regexDiaHoraAula = /^([A-Z]{2})\s+(\d{3,4}\s?\-\d{4})(.*)$/;
+
+  const regexGrHr =
+    /^(\w+\d*)\s(?:\[(\w+)\]\s)?((?:[A-ZÁÉÍÓÚÑ]+(?:\s|$))+)\s(LU|MA|MI|JU|VI)\s(\d{3,4}-\d{4})\s(.+)$/
+
 
   let parse = false;
   let newGrupo = false;
@@ -125,6 +152,7 @@ export const parse = async (lines) => {
     }
     if (parse) {
       //Si la linea es una materia Nivel - COD - MATERIA
+      console.log(line);
       const materia = line.match(regexMateria);
       if (materia) {
         newGrupo = true;
@@ -132,20 +160,29 @@ export const parse = async (lines) => {
       } else if (newGrupo) {
         //Si se sigue en el ultimo grupo de materia leida
         //Si la linea es GRUPO TIPO DOCENTE
-        const grupoDocente = line.match(regexGrupoDocente);
+        //const grupoDocente = line.match(regexGrupoDocente);
+        //token2 = grupoDocente.slice(1);
         newGrupo = false;
-        token2 = grupoDocente.slice(1);
-      } else if (line.match(regexNameOnly)) {
+
+        //GRUPO TIPO DOCENTE DIA HORA AULA
+        const grupoHora = line.match(regexGrHr);
+        console.log("GR TP", line, grupoHora);
+
+        token2 = grupoHora.slice(1);
+        addEntry(horarios, token1, token2, token3);
+      } /* else if (line.match(regexNameOnly)) {
         //Algun nombre que es muy largo aparece solo en una linea
         token2[2] += " " + line;
-      } else {
+      } */
+      /* else {
         newGrupo = true;
         //La linea es un DIA HORA AULA
         const diaHoraAula = line.match(regexDiaHoraAula);
         token3 = diaHoraAula.slice(1);
         //Agregar una linea con los datos leidos
         addEntry(horarios, token1, token2, token3);
-      }
+      } */
+      
     }
   }
   return horarios;

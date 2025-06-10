@@ -4,6 +4,7 @@ export const COLLECTIONS = {
   EVENTS: "eventos",
   CAREER_SCHEDULES: "horarios_carrera",
   ESTUDENT_SCHEDULES: "horarios_estudiantes",
+  STUDENT_PROGRESS: "progreso_estudiantes",
 
   DOCUMENTS: "documentos",
   DOCUMENT_SUBJECTS: [

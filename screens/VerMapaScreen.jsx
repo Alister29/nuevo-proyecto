@@ -192,4 +192,4 @@ const styles = StyleSheet.create({
   modalClose: { marginTop: 20, alignSelf: "center", padding: 10, backgroundColor: "#ddd", borderRadius: 5 },
 });
 
-export default VerMapaScreen;
+
