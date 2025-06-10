@@ -55,7 +55,7 @@ const puntos = [
   { id: 48, nombre: "Canchas polifuncionales", x: 678, y: 250, descripcion: "", imagen: require("../assets/48.jpeg") },
   { id: 49, nombre: "Aulas 660 y 661", x: 247, y: 337, descripcion: "", imagen: require("../assets/49.jpeg") },
 ];
-export const VerMapaScreen = () => {
+const VerMapaScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [puntoSeleccionado, setPuntoSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState("");
