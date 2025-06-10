@@ -2,8 +2,9 @@ export const COLLECTIONS = {
   USERS: "usuarios",
   PENSUM: "pensums",
   EVENTS: "eventos",
+  CAREER_SCHEDULES: "horarios_carrera",
+  ESTUDENT_SCHEDULES: "horarios_estudiantes",
 
-  SCHEDULES: "horarios",
   DOCUMENTS: "documentos",
   DOCUMENT_SUBJECTS: [
     "INGLES I",
