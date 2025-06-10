@@ -3,7 +3,7 @@ import {
   View, Text, Button, Modal, ScrollView, StyleSheet, TouchableOpacity, Alert
 } from "react-native";
 import scheduleData from "../context/scheduleData";
-import { guardarHorarioEnFirebase, cargarHorarioDesdeFirebase } from "../services";
+import { guardarHorarioEnFirebase, cargarHorarioDesdeFirebase } from "../services/scheduleService";
 
 // Días y horas en la cuadrícula del horario
 const diasSemana = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
