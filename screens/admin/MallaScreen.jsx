@@ -1,11 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, ScrollView,} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+  ScrollView,
+} from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import Papa from "papaparse";
 import { Picker } from "@react-native-picker/picker";
-import { Modal } from "../../components/Modal"; 
+import { Modal } from "../../components/Modal";
 import { subirPensum } from "../../services/pensumService";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export const MallaScreen = () => {
   const [carrera, setCarrera] = useState("Ing. Sistemas");
@@ -16,7 +24,9 @@ export const MallaScreen = () => {
 
   const seleccionarArchivo = async () => {
     try {
-      const res = await DocumentPicker.getDocumentAsync({ type: "text/csv" });
+      const res = await DocumentPicker.getDocumentAsync({
+        type: ["text/csv", "application/csv", "text/comma-separated-values"],
+      });
       if (res.canceled) return;
 
       setFileName(res.assets[0].name);
@@ -82,23 +92,29 @@ export const MallaScreen = () => {
 
   return (
     <View style={styles.container}>
-    <Text style={styles.labelMinimal}>Seleccionar carrera</Text>
-    <Picker
-      selectedValue={carrera}
-      onValueChange={(val) => setCarrera(val)}
-      style={styles.inputMinimal}
-    >
-      <Picker.Item label="Ing. Sistemas" value="Ing. Sistemas" />
-      <Picker.Item label="Ing. Informática" value="Ing. Informática" />
-    </Picker>
+      <Text style={styles.labelMinimal}>Seleccionar carrera</Text>
+      <Picker
+        selectedValue={carrera}
+        onValueChange={(val) => setCarrera(val)}
+        style={styles.inputMinimal}
+      >
+        <Picker.Item label="Ing. Sistemas" value="Ing. Sistemas" />
+        <Picker.Item label="Ing. Informática" value="Ing. Informática" />
+      </Picker>
 
-    <Text style={styles.labelMinimal}>Seleccionar CSV</Text>
-    <TouchableOpacity onPress={seleccionarArchivo} style={styles.inputMinimalRow}>
-      <Icon name="paperclip" size={18} color="#555" style={{ marginRight: 8 }} />
-      <Text style={styles.fileText}>
-        {fileName || "Examinar..."}
-      </Text>
-    </TouchableOpacity>
+      <Text style={styles.labelMinimal}>Seleccionar CSV</Text>
+      <TouchableOpacity
+        onPress={seleccionarArchivo}
+        style={styles.inputMinimalRow}
+      >
+        <Icon
+          name="paperclip"
+          size={18}
+          color="#555"
+          style={{ marginRight: 8 }}
+        />
+        <Text style={styles.fileText}>{fileName || "Examinar..."}</Text>
+      </TouchableOpacity>
 
       <Text style={styles.label}>Previsualización</Text>
       <View style={styles.previewContainer}>
@@ -137,7 +153,10 @@ export const MallaScreen = () => {
       </TouchableOpacity>
 
       {/* Modal de confirmación */}
-      <Modal isVisible={modalConfirmVisible} closeFn={() => setModalConfirmVisible(false)}>
+      <Modal
+        isVisible={modalConfirmVisible}
+        closeFn={() => setModalConfirmVisible(false)}
+      >
         <View style={styles.modalContainer}>
           <Text style={styles.modalText}>
             ¿Subir malla curricular para la carrera {carrera}?
@@ -160,7 +179,10 @@ export const MallaScreen = () => {
       </Modal>
 
       {/* Modal de éxito */}
-      <Modal isVisible={modalSuccessVisible} closeFn={() => setModalSuccessVisible(false)}>
+      <Modal
+        isVisible={modalSuccessVisible}
+        closeFn={() => setModalSuccessVisible(false)}
+      >
         <View style={styles.modalContainer}>
           <Text style={styles.modalText}>
             Se subió la malla curricular para la carrera {carrera}
@@ -173,40 +195,40 @@ export const MallaScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  label: {marginTop: 10 },
+  label: { marginTop: 10 },
   picker: { backgroundColor: "#f0f0f0", marginVertical: 5 },
   labelMinimal: {
     fontSize: 14,
     marginBottom: 6,
-    color: '#333',
-    fontWeight: '500',
+    color: "#333",
+    fontWeight: "500",
   },
 
   inputMinimal: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 3,
     fontSize: 14,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     marginBottom: 16,
   },
-    inputMinimalRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+  inputMinimalRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     marginBottom: 16,
   },
 
   fileText: {
-    color: '#555',
+    color: "#555",
     fontSize: 14,
   },
   botonExaminar: {
@@ -265,12 +287,12 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     flexShrink: 1,
   },
-    modalButton: {
+  modalButton: {
     padding: 12,
     borderRadius: 12,
     width: 100,
     alignItems: "center",
-  },  
+  },
   modalContainer: {
     padding: 24,
     margin: 16,
@@ -296,6 +318,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-  botonDeshabilitado: { backgroundColor: "#ccc"},
-  botonSubirTexto: { color: "#000"},
+  botonDeshabilitado: { backgroundColor: "#ccc" },
+  botonSubirTexto: { color: "#000" },
 });

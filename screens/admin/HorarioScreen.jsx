@@ -9,6 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 import { Picker } from "@react-native-picker/picker";
 import { Modal, ParsePDF } from "../../components";
 import { uploadCareerSchedules } from "../../services";
@@ -31,12 +32,18 @@ export const HorarioScreen = () => {
       if (res.canceled) return;
 
       setFileName(res.assets[0].name);
-      const newFileURI = res.assets[0].uri;
-      setFileURI(newFileURI);
+      const fileURI = res.assets[0].uri;
+      const file64 =
+        "data:application/pdf;base64," +
+        (await FileSystem.readAsStringAsync(fileURI, {
+          encoding: FileSystem.EncodingType.Base64,
+        }));
+      setFileURI(file64);
+      
 
       //const fileContent = await fetch(fileUri).then((r) => r.arrayBuffer());
       //console.log(fileContent);
-      
+
       //const newPDFData = await pdfParser.parse(fileContent);
       //setPdfData(newPDFData);
     } catch (err) {
@@ -45,12 +52,11 @@ export const HorarioScreen = () => {
   };
 
   const subirDatos = async () => {
-    if(!pdfData) return;
+    if (!pdfData) return;
 
-    try{
+    try {
       const respuesta = await uploadCareerSchedules(carrera, pdfData);
-    }
-    catch(error){
+    } catch (error) {
       Alert.alert("Ocurrio un error");
     }
 
@@ -131,17 +137,14 @@ export const HorarioScreen = () => {
       </View>
 
       <TouchableOpacity
-        style={[
-          styles.botonSubir,
-          !pdfData && styles.botonDeshabilitado,
-        ]}
+        style={[styles.botonSubir, !pdfData && styles.botonDeshabilitado]}
         disabled={!pdfData}
         onPress={() => setModalConfirmVisible(true)}
       >
         <Text style={styles.botonSubirTexto}>Subir</Text>
       </TouchableOpacity>
 
-      <ParsePDF uri={fileURI} onExtract={setPdfData}/>
+      {fileURI && <ParsePDF uri={fileURI} onExtract={setPdfData} />}
 
       {/* Modal de confirmación */}
       <Modal

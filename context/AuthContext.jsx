@@ -15,6 +15,7 @@ import {
 // Librerias para autentificacion con google
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
 
 // Configuracion a conexion firebase
 import { db, auth, COLLECTIONS } from "../database";
@@ -33,6 +34,10 @@ export const AuthProvider = ({ children }) => {
     expoClientId: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    redirectUri: AuthSession.makeRedirectUri({
+      scheme: "reactnativeFirebase",
+      useProxy: false,
+    })
   });
 
   useEffect(() => {
