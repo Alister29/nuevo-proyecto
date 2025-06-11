@@ -4,6 +4,7 @@ import {
 } from "react-native";
 import scheduleData from "../context/scheduleData";
 import { guardarHorarioEnFirebase, cargarHorarioDesdeFirebase } from "../services/scheduleService";
+import { useAuth } from "../context/AuthContext";
 
 // Días y horas en la cuadrícula del horario
 const diasSemana = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
@@ -13,18 +14,7 @@ const horas = [
   "15:45-17:15", "17:15-18:45", "18:45-20:15", "20:15-21:45"
 ];
 
-// Función para generar colores aleatorios por materia
-const getColorForSubject = (subject) => {
-  const colors = ["#FFCDD2", "#C8E6C9", "#BBDEFB", "#FFECB3", "#E1BEE7", "#D1C4E9", "#B2EBF2"];
-  return colors[subject.charCodeAt(0) % colors.length];
-};
-const guardarHorario = () => {
-  if (choquesMaterias.length > 0) {
-    Alert.alert("Error", "No puedes guardar el horario mientras haya choques.");
-    return;
-  }
-  guardarHorarioEnFirebase(materiasAsignadas);
-};
+
 export const HorarioScreen = () => {
   const [materiasAsignadas, setMateriasAsignadas] = useState([]);
   const [modalMateriasVisible, setModalMateriasVisible] = useState(false);
@@ -34,18 +24,42 @@ export const HorarioScreen = () => {
   const [materiaSeleccionada, setMateriaSeleccionada] = useState(null);
   const [choquesMaterias, setChoquesMaterias] = useState([]);
   const [docentesConChoque, setDocentesConChoque] = useState([]);
-
+  const { user } = useAuth();
+  
+  // Función para generar colores aleatorios por materia
+  const getColorForSubject = (subject) => {
+  const colors = ["#FFCDD2", "#C8E6C9", "#BBDEFB", "#FFECB3", "#E1BEE7", "#D1C4E9", "#B2EBF2"];
+  return colors[subject.charCodeAt(0) % colors.length];
+  };
+  const guardarHorario = () => {
+    if (choquesMaterias.length > 0) {
+      Alert.alert("Error", "No puedes guardar el horario mientras haya choques.");
+      return;
+    }else if (choquesMaterias.length === 0) {
+      guardarHorarioEnFirebase(user?.uid, materiasAsignadas); // <--- Pasa el userId
+    }
+  };
   useEffect(() => {
-    cargarHorarioDesdeFirebase((materiasCargadas) => {
-      setMateriasAsignadas(materiasCargadas);
-      setDocenteSeleccionado(
-        materiasCargadas.reduce((acc, materia) => {
-          acc[materia.nombre] = { grupo: materia.grupo };
-          return acc;
-        }, {})
-      );
-    });
-  }, []);
+    // Limpiar el estado cuando cambia el usuario
+    setMateriasAsignadas([]);
+    setDocenteSeleccionado({});
+    setChoquesMaterias([]);
+    setDocentesConChoque([]);
+    setSelectedLevel(null);         
+    setSelectedSubject(null);       
+    setMateriaSeleccionada(null);
+    if (user?.uid) {
+      cargarHorarioDesdeFirebase(user.uid, (materiasCargadas) => {
+        setMateriasAsignadas(materiasCargadas);
+        setDocenteSeleccionado(
+          materiasCargadas.reduce((acc, materia) => {
+            acc[materia.nombre] = { grupo: materia.grupo };
+            return acc;
+          }, {})
+        );
+      });
+    }
+  }, [user?.uid]);
 
   useEffect(() => {
     // Identificar materias en conflicto
@@ -144,15 +158,11 @@ export const HorarioScreen = () => {
 
                   return (
                     <View key={dia} style={[styles.cell, assignments.length > 1 && styles.cellChoque]}>
-                      {assignments.length > 1 ? (
-                        <Text style={styles.cellErrorText}>Existe un choque de horarios</Text>
-                      ) : (
-                        assignments.map((materia, index) => (
-                          <Text key={index} style={[styles.cellText, { backgroundColor: materia.color }]}>
-                            {materia.aux ? "✳ " : ""}{materia.nombre} {materia.aula} {materia.grupo}
-                          </Text>
-                        ))
-                      )}
+                      {assignments.map((materia, index) => (
+                        <Text key={index} style={[styles.cellText, { backgroundColor: materia.color }]}>
+                          {materia.aux ? "✳ " : ""}{materia.nombre} {materia.aula} {materia.grupo}
+                        </Text>
+                      ))}
                     </View>
                   );
                 })}
@@ -239,3 +249,4 @@ const styles = StyleSheet.create({
   },
   
 });
+
