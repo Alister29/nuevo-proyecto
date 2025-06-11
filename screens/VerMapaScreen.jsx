@@ -1,7 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Dimensions, TextInput, FlatList, ScrollView, Modal, Image } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
-import { useEffect } from "react";
+import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Dimensions, TextInput, FlatList, Modal, Image, ScrollView } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 const puntos = [
@@ -60,20 +58,12 @@ export const VerMapaScreen = () => {
   const [puntoSeleccionado, setPuntoSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);
-  const scrollRefX = useRef(null); // Referencia para ScrollView horizontal
-  const scrollRefY = useRef(null); // Referencia para ScrollView vertical
-  const zoom = useSharedValue(1); // Estado para zoom
-  
-  useEffect(() => {
-    // Resetea el estado cuando se monta la pantalla
-    setPuntoSeleccionado(null);
-  }, []);
-  // Estilo animado para zoom
-  const animatedStyles = useAnimatedStyle(() => ({
-    transform: [{ scale: zoom.value }],
-  }));
+  const [zoom, setZoom] = useState(1);
 
-  // Función de búsqueda
+  const scrollRefX = useRef(null);
+  const scrollRefY = useRef(null);
+
+  // Buscar lugar
   const buscarLugar = (texto) => {
     setBusqueda(texto);
     if (!texto.trim()) return setResultados([]);
@@ -82,41 +72,57 @@ export const VerMapaScreen = () => {
       punto.nombre.toLowerCase().includes(textoNormalizado) ||
       punto.descripcion.toLowerCase().includes(textoNormalizado)
     );
-
     setResultados(coincidencias);
   };
-
-  // Función para centrar la pantalla en el punto seleccionado
+ 
+  // Centrar punto
   const centrarPunto = (punto) => {
-    setPuntoSeleccionado(punto); // Mantiene el estado del punto seleccionado
-    setModalVisible(true); // Muestra el modal al seleccionar el punto
-    // Mueve el mapa horizontalmente (X)
-    scrollRefX.current.scrollTo({
-      x: punto.x - width / 2,
-      animated: true,
-    });
-  
-    // Mueve el mapa verticalmente (Y)
-    scrollRefY.current.scrollTo({
-      y: punto.y - height / 2,
-      animated: true,
-    });
+    setPuntoSeleccionado(punto);
+    setModalVisible(true);
+
+    // Centra el mapa horizontalmente (X)
+    if (scrollRefX.current) {
+      scrollRefX.current.scrollTo({
+        x: Math.max(punto.x - width / 2, 0),
+        animated: true,
+      });
+    }
+
+    // Centra el mapa verticalmente (Y)
+    if (scrollRefY.current) {
+      scrollRefY.current.scrollTo({
+        y: Math.max(punto.y - height / 2, 0),
+        animated: true,
+      });
+    }
   };
 
-  // Función para manejar zoom
-  const aumentarZoom = () => {
-    zoom.value = Math.min(zoom.value + 0.2, 3); // Máximo zoom 3x
-  };
-
-  const disminuirZoom = () => {
-    zoom.value = Math.max(zoom.value - 0.2, 1); // Mínimo zoom 1x
-  };
+  const aumentarZoom = () => setZoom((z) => Math.min(z + 0.2, 2.5));
+  const disminuirZoom = () => setZoom((z) => Math.max(z - 0.2, 1));
 
   return (
     <View style={styles.contenedor}>
+      {/* Modal de información */}
+      <Modal visible={modalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{puntoSeleccionado?.nombre}</Text>
+            <View style={{ width: "100%", alignItems: "center" }}>
+              <Image
+                source={puntoSeleccionado?.imagen}
+                style={styles.modalImage}
+              />
+            </View>
+            <Text style={styles.modalDescription}>{puntoSeleccionado?.descripcion}</Text>
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalClose}>
+              <Text>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Barra de búsqueda */}
       <TextInput style={styles.inputBusqueda} placeholder="Buscar..." value={busqueda} onChangeText={buscarLugar} />
-      
       {/* Lista de resultados de búsqueda */}
       {resultados.length > 0 && (
         <FlatList data={resultados} keyExtractor={(item) => item.id.toString()} style={styles.listaResultados}
@@ -130,20 +136,23 @@ export const VerMapaScreen = () => {
 
       {/* Contenedor con desplazamiento */}
       <ScrollView ref={scrollRefX} horizontal={true} contentContainerStyle={styles.scrollContainer}>
-       <ScrollView ref={scrollRefY}>
-         <Animated.View style={[styles.fondo, animatedStyles]}>
-           <ImageBackground source={require("../assets/MapaUni2d.png")} style={styles.fondo}>
-             {puntos.map((punto) => (
-              <TouchableOpacity key={punto.id} style={[
-              styles.marcador, 
-              { left: punto.x, top: punto.y }, 
-              puntoSeleccionado?.id === punto.id && { borderWidth: 3, borderColor: "red" } // Solo remarcar el punto
-              ]} 
-              onPress={() => centrarPunto(punto)} />
+        <ScrollView ref={scrollRefY}>
+          <View style={[styles.fondo, { transform: [{ scale: zoom }] }]}>
+            <ImageBackground source={require("../assets/MapaUni2d.png")} style={styles.fondo}>
+              {puntos.map((punto) => (
+                <TouchableOpacity
+                  key={punto.id}
+                  style={[
+                    styles.marcador,
+                    { left: punto.x, top: punto.y },
+                    puntoSeleccionado?.id === punto.id && { borderWidth: 3, borderColor: "red" }
+                  ]}
+                  onPress={() => centrarPunto(punto)}
+                />
               ))}
-           </ImageBackground>
-         </Animated.View>
-       </ScrollView>
+            </ImageBackground>
+          </View>
+        </ScrollView>
       </ScrollView>
 
       {/* Botones de zoom */}
@@ -155,20 +164,6 @@ export const VerMapaScreen = () => {
           <Text style={styles.zoomText}>-</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Modal de información */}
-      <Modal visible={modalVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{puntoSeleccionado?.nombre}</Text>
-            <Image source={puntoSeleccionado?.imagen} style={styles.modalImage} />
-            <Text style={styles.modalDescription}>{puntoSeleccionado?.descripcion}</Text>
-            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalClose}>
-              <Text>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -180,16 +175,50 @@ const styles = StyleSheet.create({
   inputBusqueda: { height: 40, borderWidth: 1, borderColor: "#ccc", borderRadius: 5, paddingHorizontal: 10, marginBottom: 10 },
   listaResultados: { backgroundColor: "#fff", padding: 5, borderRadius: 5, maxHeight: 150 },
   resultadoTexto: { padding: 10, fontSize: 16 },
-  scrollContainer: { flexDirection: "column", alignItems: "center" },
-  zoomControls: { position: "absolute", bottom: 50, right: 20, flexDirection: "row" },
-  zoomButton: { backgroundColor: "#000", padding: 10, borderRadius: 5, margin: 5 },
-  zoomText: { fontSize: 20, color: "#fff" },
-  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
-  modalContent: { backgroundColor: "#fff", padding: 20, borderRadius: 10, width: "80%" },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: width * 0.85,
+    maxHeight: height * 0.8,
+    alignItems: "center",
+  },
   modalTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
-  modalImage: { width: "100%", height: 200, resizeMode: "contain", borderRadius: 10 },
+  modalImage: {
+    width: width * 0.75,
+    height: (width * 0.75) * (7 / 16),
+    resizeMode: "contain",
+    borderRadius: 10,
+    marginVertical: 10,
+  },
   modalDescription: { marginTop: 10 },
   modalClose: { marginTop: 20, alignSelf: "center", padding: 10, backgroundColor: "#ddd", borderRadius: 5 },
+  zoomControls: {
+    position: "absolute",
+    bottom: 30,
+    right: 30,
+    flexDirection: "column",
+    backgroundColor: "rgba(255,255,255,0.8)",
+    borderRadius: 10,
+    padding: 5,
+    elevation: 5,
+  },
+  zoomButton: {
+    padding: 10,
+    alignItems: "center",
+  },
+  zoomText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#007AFF",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
 });
-
-
