@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Dimensions, TextInput, FlatList, Modal, Image, ScrollView } from "react-native";
+import { AuthContext } from "../context/AuthContext"; 
 
 const { width, height } = Dimensions.get("window");
 const puntos = [
@@ -63,6 +64,26 @@ export const VerMapaScreen = () => {
   const scrollRefX = useRef(null);
   const scrollRefY = useRef(null);
 
+  // Obtén el usuario del contexto
+  const { user } = useContext(AuthContext);
+
+  // Efecto para resetear todo cuando cambia el usuario
+  useEffect(() => {
+    setModalVisible(false);
+    setPuntoSeleccionado(null);
+    setBusqueda("");
+    setResultados([]);
+    setZoom(1);
+
+    // Resetea la posición del scroll horizontal y vertical
+    if (scrollRefX.current) {
+      scrollRefX.current.scrollTo({ x: 0, animated: false });
+    }
+    if (scrollRefY.current) {
+      scrollRefY.current.scrollTo({ y: 0, animated: false });
+    }
+  }, [user?.uid]);
+
   // Buscar lugar
   const buscarLugar = (texto) => {
     setBusqueda(texto);
@@ -114,7 +135,14 @@ export const VerMapaScreen = () => {
               />
             </View>
             <Text style={styles.modalDescription}>{puntoSeleccionado?.descripcion}</Text>
-            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalClose}>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(false);
+                setBusqueda("");        // Limpia el buscador
+                setResultados([]);     // Limpia los resultados
+              }}
+              style={styles.modalClose}
+            >
               <Text>Cerrar</Text>
             </TouchableOpacity>
           </View>
