@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     redirectUri: AuthSession.makeRedirectUri({
-      scheme: "reactnativeFirebase",
+      scheme: "com.anonymous.reactnativefirebase",
       useProxy: false,
     })
   });

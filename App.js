@@ -1,5 +1,7 @@
 import "react-native-gesture-handler";
 import React from "react";
+import { StatusBar } from "expo-status-bar";
+
 import { AuthProvider, ThemeProvider } from "./context";
 import { RootNavigator } from "./navigation";
 
@@ -10,6 +12,7 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <AuthProvider>
+          <StatusBar backgroundColor="transparent" translucent style="dark"/>
           <RootNavigator />
         </AuthProvider>
       </ThemeProvider>
