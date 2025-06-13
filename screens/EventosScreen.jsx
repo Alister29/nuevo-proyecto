@@ -40,41 +40,37 @@ export const EventosScreen = () => {
   const [expandidoId, setExpandidoId] = useState(null); // Para la lista
 
   useEffect(() => {
-  const fetchEventos = async () => {
-    try {
-      const db = getFirestore();
-      const q = query(
-        collection(db, "eventos"),
-        orderBy("fecha", "desc"),
-        limit(20)
-      );
-      const snapshot = await getDocs(q);
-      const eventos = snapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        // FILTRAR SOLO EVENTOS CON FECHA DE INICIO HOY O POSTERIOR
-        .filter(evento => {
-          if (!evento.fecha?.toDate) return false; // Excluir si no tiene fechaInicio válida
-          const fecha = new Date(evento.fecha.toDate());
-          const hoy = new Date();
-          // Poner hora a 0 para comparar solo fecha (sin hora)
-          hoy.setHours(0,0,0,0);
-          fecha.setHours(0,0,0,0);
-          return fecha >= hoy;
-        });
-
-      setEventosRecientes(eventos.slice(0, 3));
-      setEventosLista(eventos.slice(3));
-    } catch (error) {
-      console.error("Error al cargar eventos:", error);
-    }
-  };
-
-  fetchEventos();
-}, []);
-
+    const fetchEventos = async () => {
+      try {
+        const db = getFirestore();
+        const q = query(
+          collection(db, "eventos"),
+          orderBy("fecha", "desc"),
+          limit(20)
+        );
+        const snapshot = await getDocs(q);
+        const eventos = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          // FILTRAR SOLO EVENTOS CON FECHA DE INICIO HOY O POSTERIOR
+          .filter(evento => {
+            if (!evento.fecha?.toDate) return false; // Excluir si no tiene fechaInicio válida
+            const fecha = new Date(evento.fecha.toDate());
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            fecha.setHours(0, 0, 0, 0);
+            return fecha >= hoy;
+          });
+        setEventosRecientes(eventos.slice(0, 3));
+        setEventosLista(eventos.slice(3));
+      } catch (error) {
+        console.error("Error al cargar eventos:", error);
+      }
+    };
+    fetchEventos();
+  }, []);
 
   const filtrarPorTipo = (eventos) => {
     if (tipoSeleccionado === "todos") return eventos;
@@ -88,7 +84,6 @@ export const EventosScreen = () => {
 
   const renderEvento = ({ item }) => {
     const expandido = expandidoId === item.id;
-
     return (
       <TouchableOpacity
         style={styles.eventItem}
@@ -100,15 +95,12 @@ export const EventosScreen = () => {
         <View style={styles.headerRow}>
           <Text style={styles.eventTitle}>{item.titulo || "Sin título"}</Text>
         </View>
-
         {!expandido && <Text style={styles.verMasHint}>Presione para ver más</Text>}
-
         {expandido && (
           <View style={styles.expandedBox}>
             <Text style={styles.eventDescription}>
               {item.descripcion || "Sin descripción"}
             </Text>
-
             <View style={styles.infoRow}>
               <View style={styles.infoColumnLeft}>
                 <Text style={styles.eventDate}>
@@ -127,28 +119,6 @@ export const EventosScreen = () => {
                 </Text>
               </View>
             </View>
-
-            <View style={styles.infoRow}>
-              <View style={styles.infoColumnLeft}>
-                <Text style={styles.eventDate}>
-                   🕒 Inicio:
-                    {item.hora?.toDate
-                    ? new Date(item.hora.toDate()).toLocaleTimeString()
-                    : "—"}
-
-                  </Text>
-              </View>
-              <View 
-              style={styles.infoColumnRight}>
-                <Text style={styles.eventDate}>
-                    🕒 Fin:{" "}
-                    {item.horaFin?.toDate
-                      ? new Date(item.horaFin.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      : "—"}
-                  </Text> 
-              </View>
-            </View>
-
             {item.imagenB64 && (
               <TouchableOpacity
                 onPress={() => verImagen(item)}
@@ -217,7 +187,6 @@ export const EventosScreen = () => {
                     />
                   </TouchableOpacity>
                 )}
-
                 <View style={styles.carouselTextContainer}>
                   <View style={styles.titleRow}>
                     <TouchableOpacity
@@ -248,12 +217,10 @@ export const EventosScreen = () => {
             {(() => {
               const evento = eventosRecientes.find(e => e.id === eventoExpandidoCarruselId);
               if (!evento) return null;
-
               return (
                 <>
                   <Text style={styles.expandedTitle}>{evento.titulo || "Sin título"}</Text>
                   <Text style={styles.expandedDescription}>{evento.descripcion || "Sin descripción"}</Text>
-
                   <View style={styles.infoRow}>
                     <View style={styles.infoColumnLeft}>
                       <Text style={styles.eventDate}>
@@ -270,27 +237,6 @@ export const EventosScreen = () => {
                           ? new Date(evento.fechaFin.toDate()).toLocaleDateString()
                           : "—"}
                       </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.infoRow}>
-                    <View style={styles.infoColumnLeft}>
-                      <Text style={styles.eventDate}>
-                          🕒 Inicio:{" "}
-                          {evento.hora?.toDate
-                            ? new Date(evento.hora.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                            : "—"}
-                        </Text>
-
-                    </View>
-                    <View style={styles.infoColumnRight}>
-                     <Text style={styles.eventDate}>
-                          🕒 Fin:{" "}
-                          {evento.horaFin?.toDate
-                            ? new Date(evento.horaFin.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                            : "—"}
-                      </Text>
-
                     </View>
                   </View>
                 </>
@@ -430,61 +376,61 @@ const styles = StyleSheet.create({
   },
   eventDescription: {
     marginBottom: 6,
-color: "#444",
-},
-modalContainer: {
-flex: 1,
-backgroundColor: "rgba(0,0,0,0.6)",
-justifyContent: "center",
-alignItems: "center",
-},
-modalOverlay: {
-...StyleSheet.absoluteFillObject,
-},
-modalContent: {
-backgroundColor: "#fff",
-borderRadius: 10,
-padding: 10,
-maxWidth: "90%",
-maxHeight: "80%",
-},
-modalImage: {
-width: 300,
-height: 300,
-resizeMode: "contain",
-borderRadius: 8,
-},
-closeButton: {
-alignSelf: "flex-end",
-padding: 6,
-marginBottom: 10,
-backgroundColor: "#2a7bf6",
-borderRadius: 6,
-},
-closeButtonText: {
-color: "#fff",
-fontWeight: "bold",
-},
-expandedInfoContainer: {
-backgroundColor: "#e6f0ff",
-marginHorizontal: 16,
-marginBottom: 12,
-padding: 12,
-borderRadius: 10,
-},
-expandedTitle: {
-fontWeight: "bold",
-fontSize: 17,
-marginBottom: 8,
-},
-expandedDescription: {
-fontSize: 15,
-marginBottom: 8,
-color: "#333",
-},
-verMasHint: {
-fontStyle: "italic",
-color: "#666",
-marginTop: 4,
-},
+    color: "#444",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 10,
+    maxWidth: "90%",
+    maxHeight: "80%",
+  },
+  modalImage: {
+    width: 300,
+    height: 300,
+    resizeMode: "contain",
+    borderRadius: 8,
+  },
+  closeButton: {
+    alignSelf: "flex-end",
+    padding: 6,
+    marginBottom: 10,
+    backgroundColor: "#2a7bf6",
+    borderRadius: 6,
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  expandedInfoContainer: {
+    backgroundColor: "#e6f0ff",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 10,
+  },
+  expandedTitle: {
+    fontWeight: "bold",
+    fontSize: 17,
+    marginBottom: 8,
+  },
+  expandedDescription: {
+    fontSize: 15,
+    marginBottom: 8,
+    color: "#333",
+  },
+  verMasHint: {
+    fontStyle: "italic",
+    color: "#666",
+    marginTop: 4,
+  },
 });
