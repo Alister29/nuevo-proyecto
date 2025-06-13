@@ -1,0 +1,419 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.anonymous.reactnativefirebase"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+11-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:5:3-75
+11-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:5:20-73
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:2:3-64
+12-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:2:20-62
+13    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+13-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:3:3-77
+13-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:3:20-75
+14    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+14-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:4:3-68
+14-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:4:20-66
+15    <uses-permission android:name="android.permission.VIBRATE" />
+15-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:6:3-63
+15-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:6:20-61
+16    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+16-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:7:3-78
+16-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:7:20-76
+17
+18    <queries>
+18-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:8:3-14:13
+19        <intent>
+19-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:9:5-13:14
+20            <action android:name="android.intent.action.VIEW" />
+20-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:10:7-58
+20-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:10:15-56
+21
+22            <category android:name="android.intent.category.BROWSABLE" />
+22-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:11:7-67
+22-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:11:17-65
+23
+24            <data android:scheme="https" />
+24-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:12:7-37
+24-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:12:13-35
+25        </intent>
+26        <!-- Query open documents -->
+27        <intent>
+27-->[:expo-document-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-document-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:9-17:18
+28            <action android:name="android.intent.action.OPEN_DOCUMENT" />
+28-->[:expo-document-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-document-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-74
+28-->[:expo-document-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-document-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:21-71
+29
+30            <category android:name="android.intent.category.DEFAULT" />
+30-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:26:9-67
+30-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:26:19-65
+31            <category android:name="android.intent.category.OPENABLE" />
+31-->[:expo-document-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-document-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-73
+31-->[:expo-document-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-document-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:23-70
+32
+33            <data android:mimeType="*/*" />
+33-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:12:7-37
+34        </intent> <!-- Query open documents -->
+35        <intent>
+35-->[:expo-file-system] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:9-17:18
+36            <action android:name="android.intent.action.OPEN_DOCUMENT_TREE" />
+36-->[:expo-file-system] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:13-79
+36-->[:expo-file-system] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:21-76
+37        </intent>
+38        <intent>
+38-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:9-19:18
+39
+40            <!-- Required for picking images from the camera roll if targeting API 30 -->
+41            <action android:name="android.media.action.IMAGE_CAPTURE" />
+41-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:13-73
+41-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:21-70
+42        </intent>
+43        <intent>
+43-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:9-24:18
+44
+45            <!-- Required for picking images from the camera if targeting API 30 -->
+46            <action android:name="android.media.action.ACTION_VIDEO_CAPTURE" />
+46-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:13-80
+46-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:21-77
+47        </intent>
+48        <intent>
+48-->[:expo-web-browser] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-web-browser\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:18
+49
+50            <!-- Required for opening tabs if targeting API 30 -->
+51            <action android:name="android.support.customtabs.action.CustomTabsService" />
+51-->[:expo-web-browser] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-web-browser\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-90
+51-->[:expo-web-browser] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-web-browser\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:21-87
+52        </intent>
+53        <intent>
+53-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:10:9-16:18
+54            <action android:name="android.intent.action.GET_CONTENT" />
+54-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:11:13-72
+54-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:11:21-69
+55
+56            <category android:name="android.intent.category.OPENABLE" />
+56-->[:expo-document-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-document-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-73
+56-->[:expo-document-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-document-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:23-70
+57
+58            <data android:mimeType="*/*" />
+58-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:12:7-37
+59        </intent>
+60    </queries> <!-- Required for picking images from camera directly -->
+61    <uses-permission android:name="android.permission.CAMERA" />
+61-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-65
+61-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:22-62
+62
+63    <permission
+63-->[androidx.core:core:1.13.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\ff2f7080433a150db5a1d0c5225722e6\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+64        android:name="com.anonymous.reactnativefirebase.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+64-->[androidx.core:core:1.13.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\ff2f7080433a150db5a1d0c5225722e6\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+65        android:protectionLevel="signature" />
+65-->[androidx.core:core:1.13.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\ff2f7080433a150db5a1d0c5225722e6\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+66
+67    <uses-permission android:name="com.anonymous.reactnativefirebase.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+67-->[androidx.core:core:1.13.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\ff2f7080433a150db5a1d0c5225722e6\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+67-->[androidx.core:core:1.13.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\ff2f7080433a150db5a1d0c5225722e6\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+68    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
+68-->[com.android.installreferrer:installreferrer:2.2] C:\Users\Carla\.gradle\caches\8.10.2\transforms\0fc32cf077dc2368bcd5cc296267ef97\transformed\installreferrer-2.2\AndroidManifest.xml:9:5-110
+68-->[com.android.installreferrer:installreferrer:2.2] C:\Users\Carla\.gradle\caches\8.10.2\transforms\0fc32cf077dc2368bcd5cc296267ef97\transformed\installreferrer-2.2\AndroidManifest.xml:9:22-107
+69
+70    <application
+70-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:15:3-32:17
+71        android:name="com.anonymous.reactnativefirebase.MainApplication"
+71-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:15:16-47
+72        android:allowBackup="true"
+72-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:15:162-188
+73        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+73-->[androidx.core:core:1.13.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\ff2f7080433a150db5a1d0c5225722e6\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+74        android:debuggable="true"
+75        android:extractNativeLibs="false"
+76        android:icon="@mipmap/ic_launcher"
+76-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:15:81-115
+77        android:label="@string/app_name"
+77-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:15:48-80
+78        android:roundIcon="@mipmap/ic_launcher_round"
+78-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:15:116-161
+79        android:supportsRtl="true"
+79-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:15:221-247
+80        android:theme="@style/AppTheme"
+80-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:15:189-220
+81        android:usesCleartextTraffic="true" >
+81-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\debug\AndroidManifest.xml:6:18-53
+82        <meta-data
+82-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:16:5-83
+83            android:name="expo.modules.updates.ENABLED"
+83-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:16:16-59
+84            android:value="false" />
+84-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:16:60-81
+85        <meta-data
+85-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:17:5-105
+86            android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH"
+86-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:17:16-80
+87            android:value="ALWAYS" />
+87-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:17:81-103
+88        <meta-data
+88-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:18:5-99
+89            android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS"
+89-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:18:16-79
+90            android:value="0" />
+90-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:18:80-97
+91
+92        <activity
+92-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:19:5-31:16
+93            android:name="com.anonymous.reactnativefirebase.MainActivity"
+93-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:19:15-43
+94            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode"
+94-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:19:44-134
+95            android:exported="true"
+95-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:19:256-279
+96            android:launchMode="singleTask"
+96-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:19:135-166
+97            android:screenOrientation="portrait"
+97-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:19:280-316
+98            android:theme="@style/Theme.App.SplashScreen"
+98-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:19:210-255
+99            android:windowSoftInputMode="adjustResize" >
+99-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:19:167-209
+100            <intent-filter>
+100-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:20:7-23:23
+101                <action android:name="android.intent.action.MAIN" />
+101-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:21:9-60
+101-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:21:17-58
+102
+103                <category android:name="android.intent.category.LAUNCHER" />
+103-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:22:9-68
+103-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:22:19-66
+104            </intent-filter>
+105            <intent-filter>
+105-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:24:7-30:23
+106                <action android:name="android.intent.action.VIEW" />
+106-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:10:7-58
+106-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:10:15-56
+107
+108                <category android:name="android.intent.category.DEFAULT" />
+108-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:26:9-67
+108-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:26:19-65
+109                <category android:name="android.intent.category.BROWSABLE" />
+109-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:11:7-67
+109-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:11:17-65
+110
+111                <data android:scheme="com.anonymous.reactnativefirebase" />
+111-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:12:7-37
+111-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:12:13-35
+112                <data android:scheme="exp+react-native-firebase" />
+112-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:12:7-37
+112-->C:\Users\Carla\202\progra_movil\nuevo-proyecto\android\app\src\main\AndroidManifest.xml:12:13-35
+113            </intent-filter>
+114        </activity>
+115
+116        <provider
+116-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-16:20
+117            android:name="com.reactnativecommunity.webview.RNCWebViewFileProvider"
+117-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-83
+118            android:authorities="com.anonymous.reactnativefirebase.fileprovider"
+118-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-64
+119            android:exported="false"
+119-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-37
+120            android:grantUriPermissions="true" >
+120-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-47
+121            <meta-data
+121-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+122                android:name="android.support.FILE_PROVIDER_PATHS"
+122-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+123                android:resource="@xml/file_provider_paths" />
+123-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+124        </provider>
+125        <provider
+125-->[:react-native-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-16:20
+126            android:name="com.imagepicker.ImagePickerProvider"
+126-->[:react-native-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-63
+127            android:authorities="com.anonymous.reactnativefirebase.imagepickerprovider"
+127-->[:react-native-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-71
+128            android:exported="false"
+128-->[:react-native-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-37
+129            android:grantUriPermissions="true" >
+129-->[:react-native-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-47
+130            <meta-data
+130-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+131                android:name="android.support.FILE_PROVIDER_PATHS"
+131-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+132                android:resource="@xml/imagepicker_provider_paths" />
+132-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+133        </provider>
+134        <provider
+134-->[:expo-file-system] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:9-30:20
+135            android:name="expo.modules.filesystem.FileSystemFileProvider"
+135-->[:expo-file-system] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-74
+136            android:authorities="com.anonymous.reactnativefirebase.FileSystemFileProvider"
+136-->[:expo-file-system] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:13-74
+137            android:exported="false"
+137-->[:expo-file-system] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-37
+138            android:grantUriPermissions="true" >
+138-->[:expo-file-system] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:13-47
+139            <meta-data
+139-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+140                android:name="android.support.FILE_PROVIDER_PATHS"
+140-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+141                android:resource="@xml/file_system_provider_paths" />
+141-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+142        </provider>
+143
+144        <service
+144-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:9-40:19
+145            android:name="com.google.android.gms.metadata.ModuleDependencies"
+145-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:13-78
+146            android:enabled="false"
+146-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:13-36
+147            android:exported="false" >
+147-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:31:13-37
+148            <intent-filter>
+148-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:33:13-35:29
+149                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+149-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:34:17-94
+149-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:34:25-91
+150            </intent-filter>
+151
+152            <meta-data
+152-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:37:13-39:36
+153                android:name="photopicker_activity:0:required"
+153-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:38:17-63
+154                android:value="" />
+154-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:39:17-33
+155        </service>
+156
+157        <activity
+157-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:42:9-44:59
+158            android:name="com.canhub.cropper.CropImageActivity"
+158-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:43:13-64
+159            android:exported="true"
+159-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:35:13-36
+160            android:theme="@style/Base.Theme.AppCompat" /> <!-- https://developer.android.com/guide/topics/manifest/provider-element.html -->
+160-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:44:13-56
+161        <provider
+161-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:46:9-54:20
+162            android:name="expo.modules.imagepicker.fileprovider.ImagePickerFileProvider"
+162-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:47:13-89
+163            android:authorities="com.anonymous.reactnativefirebase.ImagePickerFileProvider"
+163-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:48:13-75
+164            android:exported="false"
+164-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:49:13-37
+165            android:grantUriPermissions="true" >
+165-->[:expo-image-picker] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-image-picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:50:13-47
+166            <meta-data
+166-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+167                android:name="android.support.FILE_PROVIDER_PATHS"
+167-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+168                android:resource="@xml/image_picker_provider_paths" />
+168-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+169        </provider>
+170
+171        <meta-data
+171-->[:expo-modules-core] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-11:89
+172            android:name="org.unimodules.core.AppLoader#react-native-headless"
+172-->[:expo-modules-core] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-79
+173            android:value="expo.modules.adapters.react.apploader.RNHeadlessAppLoader" />
+173-->[:expo-modules-core] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-86
+174        <meta-data
+174-->[:expo-modules-core] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:9-15:45
+175            android:name="com.facebook.soloader.enabled"
+175-->[:expo-modules-core] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-57
+176            android:value="true" />
+176-->[:expo-modules-core] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-33
+177
+178        <activity
+178-->[com.facebook.react:react-android:0.76.9] C:\Users\Carla\.gradle\caches\8.10.2\transforms\380020bc4ae98bb0118161d36add3474\transformed\react-android-0.76.9-debug\AndroidManifest.xml:19:9-21:40
+179            android:name="com.facebook.react.devsupport.DevSettingsActivity"
+179-->[com.facebook.react:react-android:0.76.9] C:\Users\Carla\.gradle\caches\8.10.2\transforms\380020bc4ae98bb0118161d36add3474\transformed\react-android-0.76.9-debug\AndroidManifest.xml:20:13-77
+180            android:exported="false" />
+180-->[com.facebook.react:react-android:0.76.9] C:\Users\Carla\.gradle\caches\8.10.2\transforms\380020bc4ae98bb0118161d36add3474\transformed\react-android-0.76.9-debug\AndroidManifest.xml:21:13-37
+181
+182        <provider
+182-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:23:9-31:20
+183            android:name="com.canhub.cropper.CropFileProvider"
+183-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:24:13-63
+184            android:authorities="com.anonymous.reactnativefirebase.cropper.fileprovider"
+184-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:25:13-72
+185            android:exported="false"
+185-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:26:13-37
+186            android:grantUriPermissions="true" >
+186-->[com.github.CanHub:Android-Image-Cropper:4.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\a2b4a64703ecd52a4e52e34990681980\transformed\Android-Image-Cropper-4.3.1\AndroidManifest.xml:27:13-47
+187            <meta-data
+187-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+188                android:name="android.support.FILE_PROVIDER_PATHS"
+188-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+189                android:resource="@xml/library_file_paths" />
+189-->[:react-native-webview] C:\Users\Carla\202\progra_movil\nuevo-proyecto\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+190        </provider>
+191        <provider
+191-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Carla\.gradle\caches\8.10.2\transforms\516fc94d722a4c7d46bf2d1c58cfa627\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+192            android:name="androidx.startup.InitializationProvider"
+192-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Carla\.gradle\caches\8.10.2\transforms\516fc94d722a4c7d46bf2d1c58cfa627\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+193            android:authorities="com.anonymous.reactnativefirebase.androidx-startup"
+193-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Carla\.gradle\caches\8.10.2\transforms\516fc94d722a4c7d46bf2d1c58cfa627\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+194            android:exported="false" >
+194-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Carla\.gradle\caches\8.10.2\transforms\516fc94d722a4c7d46bf2d1c58cfa627\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+195            <meta-data
+195-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Carla\.gradle\caches\8.10.2\transforms\516fc94d722a4c7d46bf2d1c58cfa627\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+196                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+196-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Carla\.gradle\caches\8.10.2\transforms\516fc94d722a4c7d46bf2d1c58cfa627\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+197                android:value="androidx.startup" />
+197-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Carla\.gradle\caches\8.10.2\transforms\516fc94d722a4c7d46bf2d1c58cfa627\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+198            <meta-data
+198-->[androidx.lifecycle:lifecycle-process:2.8.3] C:\Users\Carla\.gradle\caches\8.10.2\transforms\9557b60ceb2f7238af5b8c04dd860dfc\transformed\lifecycle-process-2.8.3\AndroidManifest.xml:29:13-31:52
+199                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+199-->[androidx.lifecycle:lifecycle-process:2.8.3] C:\Users\Carla\.gradle\caches\8.10.2\transforms\9557b60ceb2f7238af5b8c04dd860dfc\transformed\lifecycle-process-2.8.3\AndroidManifest.xml:30:17-78
+200                android:value="androidx.startup" />
+200-->[androidx.lifecycle:lifecycle-process:2.8.3] C:\Users\Carla\.gradle\caches\8.10.2\transforms\9557b60ceb2f7238af5b8c04dd860dfc\transformed\lifecycle-process-2.8.3\AndroidManifest.xml:31:17-49
+201            <meta-data
+201-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+202                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+202-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+203                android:value="androidx.startup" />
+203-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+204        </provider>
+205
+206        <receiver
+206-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+207            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+207-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+208            android:directBootAware="false"
+208-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+209            android:enabled="true"
+209-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+210            android:exported="true"
+210-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+211            android:permission="android.permission.DUMP" >
+211-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+212            <intent-filter>
+212-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+213                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+213-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+213-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+214            </intent-filter>
+215            <intent-filter>
+215-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+216                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+216-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+216-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+217            </intent-filter>
+218            <intent-filter>
+218-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+219                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+219-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+219-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+220            </intent-filter>
+221            <intent-filter>
+221-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+222                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+222-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+222-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Carla\.gradle\caches\8.10.2\transforms\c6979c78000bc5415a451680edfde3a6\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+223            </intent-filter>
+224        </receiver>
+225    </application>
+226
+227</manifest>
