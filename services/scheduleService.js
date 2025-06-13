@@ -1,6 +1,7 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../database/firebaseConfig";
 import { COLLECTIONS } from "../database/collections";
+import { Alert } from "react-native";
 
 /**
  * Obtiene el horario guardado del usuario en Firebase.
@@ -35,6 +36,10 @@ async function guardarHorarioEnFirebase(userId, materiasAsignadas) {
       horario: materiasAsignadas,
     });
     console.log("✅ Horario guardado correctamente.");
+    Alert.alert(
+      "Horario guardado",
+      "Tu horario ha sido guardado correctamente."
+    );
   } catch (error) {
     console.error("Error al guardar el horario:", error);
   }
