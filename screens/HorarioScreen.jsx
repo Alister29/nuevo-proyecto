@@ -18,12 +18,12 @@ const horas = [
 export const HorarioScreen = () => {
   const [materiasAsignadas, setMateriasAsignadas] = useState([]);
   const [modalMateriasVisible, setModalMateriasVisible] = useState(false);
-  const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [docenteSeleccionado, setDocenteSeleccionado] = useState({});
   const [materiaSeleccionada, setMateriaSeleccionada] = useState(null);
   const [choquesMaterias, setChoquesMaterias] = useState([]);
   const [docentesConChoque, setDocentesConChoque] = useState([]);
+  const [expandedLevels, setExpandedLevels] = useState([]);
   const { user } = useAuth();
   
   // Función para generar colores aleatorios por materia
@@ -37,6 +37,7 @@ export const HorarioScreen = () => {
       return;
     }else if (choquesMaterias.length === 0) {
       guardarHorarioEnFirebase(user?.uid, materiasAsignadas); // <--- Pasa el userId
+      
     }
   };
   useEffect(() => {
@@ -45,7 +46,6 @@ export const HorarioScreen = () => {
     setDocenteSeleccionado({});
     setChoquesMaterias([]);
     setDocentesConChoque([]);
-    setSelectedLevel(null);         
     setSelectedSubject(null);       
     setMateriaSeleccionada(null);
     if (user?.uid) {
@@ -124,8 +124,25 @@ export const HorarioScreen = () => {
 
   // Función para expandir/contraer niveles
   const toggleLevel = (level) => {
-    setSelectedLevel(selectedLevel === level ? null : level);
-    setSelectedSubject(null); // Contraer materias al cambiar de nivel
+    setExpandedLevels(prev =>
+      prev.includes(level)
+        ? prev.filter(l => l !== level) // Contrae si ya está abierto
+        : [...prev, level]              // Expande si no está abierto
+    );
+    setSelectedSubject(null);
+  };
+
+  const getFirstAssignedLevel = () => {
+    for (const level of Object.keys(scheduleData)) {
+      if (
+        scheduleData[level].some(subject =>
+          materiasAsignadas.some(m => m.nombre === subject.nombre)
+        )
+      ) {
+        return level;
+      }
+    }
+    return null;
   };
 
   return (
@@ -172,7 +189,21 @@ export const HorarioScreen = () => {
         </ScrollView>
       </ScrollView>
 
-      <Button title="Ver Materias" onPress={() => setModalMateriasVisible(true)} color={choquesMaterias.length > 0 ? "red" : "blue"}/>
+      <Button
+  title="Ver Materias"
+  onPress={() => {
+    // Encuentra niveles con materias asignadas o en choque
+    const nivelesAExpandir = Object.keys(scheduleData).filter(level =>
+      scheduleData[level].some(subject =>
+        materiasAsignadas.some(m => m.nombre === subject.nombre) ||
+        choquesMaterias.includes(subject.nombre)
+      )
+    );
+    setExpandedLevels(nivelesAExpandir);
+    setModalMateriasVisible(true);
+  }}
+  color={choquesMaterias.length > 0 ? "red" : "blue"}
+/>
       <Button title="Guardar horario" onPress={guardarHorario} color={choquesMaterias.length > 0 ? "red" : "blue"} />
 
       {/* Modal para seleccionar materias por nivel */}
@@ -186,12 +217,19 @@ export const HorarioScreen = () => {
                 </TouchableOpacity>
 
                 {/* Si el nivel está expandido, mostrar sus materias debajo */}
-                {selectedLevel === level && (
+                {expandedLevels.includes(level) && (
                   <View>
                     {scheduleData[level]?.map((subject, index) => (
                       <View key={index} style={styles.materiaContainer}>
                         <TouchableOpacity onPress={() => seleccionarMateria(subject)}>
-                          <Text style={[styles.materiaTitulo, selectedSubject === subject && styles.materiaSeleccionada, choquesMaterias.includes(subject.nombre) && styles.elementoRojo]}>
+                          <Text
+                            style={[
+                              styles.materiaTitulo,
+                              (selectedSubject === subject ||
+                                materiasAsignadas.some(m => m.nombre === subject.nombre)) && styles.materiaSeleccionada,
+                              choquesMaterias.includes(subject.nombre) && styles.elementoRojo
+                            ]}
+                          >
                             {subject.nombre}
                           </Text>
                         </TouchableOpacity>
@@ -199,10 +237,22 @@ export const HorarioScreen = () => {
                         {/* Si la materia está expandida, mostrar los docentes debajo */}
                         {selectedSubject === subject && subject.docentes.map((docente, i) => {
                           const docenteKey = `${subject.nombre}-${docente.grupo}`;
+                          const isDocenteSeleccionado =
+                            docenteSeleccionado[subject.nombre]?.grupo === docente.grupo;
                           return (
-                          <TouchableOpacity key={i} onPress={() => seleccionarDocente(subject, docente)} style={[styles.docenteItem, docentesConChoque.includes(docenteKey) && styles.elementoRojo]}>
-                            <Text>{docente.grupo} {docente.nombre}</Text>
-                          </TouchableOpacity>
+                            <TouchableOpacity
+                              key={i}
+                              onPress={() => seleccionarDocente(subject, docente)}
+                              style={[
+                                styles.docenteItem,
+                                isDocenteSeleccionado && styles.docenteSeleccionado, // Azul oscuro si selecciona
+                                docentesConChoque.includes(docenteKey) && styles.elementoRojo
+                              ]}
+                            >
+                              <Text>
+                                {docente.grupo} {docente.nombre}
+                              </Text>
+                            </TouchableOpacity>
                           );
                         })}
                       </View>
@@ -234,8 +284,9 @@ const styles = StyleSheet.create({
   modalContainer: { flex: 1, padding: 20, backgroundColor: "white" },
   nivelTitulo: { fontSize: 18, fontWeight: "bold", marginTop: 10 },
   materiaTitulo: { fontSize: 16, padding: 10, backgroundColor: "#007AFF", color: "white" },
-  materiaSeleccionada: { backgroundColor: "#005BB5" },
+  materiaSeleccionada: { backgroundColor: "#003366" }, // Azul oscuro
   docenteItem: { fontSize: 14, paddingVertical: 5, color: "white", backgroundColor: "#007AFF", marginBottom: 2 },
+  docenteSeleccionado: { backgroundColor: "#003366" }, // Azul oscuro
   notificationBox: {
     backgroundColor: "#007AFF",
     padding: 10,
